@@ -17,21 +17,25 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 (function (factory) {
     if (typeof module === "object" && typeof module.exports === "object") {
         var v = factory(require, exports);
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "fs", "../config"], factory);
+        define(["require", "exports", "fs", "../config", "axios"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const fs = __importStar(require("fs"));
     const config_1 = require("../config");
+    const axios_1 = __importDefault(require("axios"));
     /**
-     * runner
+     * runner, uitgevoerd door index.ts
      */
     function rechtbankScrape() {
         const dagenTeScrapen = lijstDagenTeScrapen();
@@ -42,6 +46,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
         const d = routeNaam.replace('000000.json', '');
         return new Date(d.substring(0, 4) + '-' + d.substring(4, 6) + '-' + d.substring(6, 8));
     }
+    /**
+     * lees map scrape-res/rechtbank
+     * pak laatst geschreven bestand & vergelijk op datum
+     * geef data terug die gescraped moeten worden
+     * data als YYYY-MM-DD
+     */
     function lijstDagenTeScrapen() {
         const rechtbankScraperRes = fs.readdirSync(`${config_1.config.pad.scrapeRes}/rechtbank`);
         const laatsteScrape = rechtbankScraperRes[rechtbankScraperRes.length - 1]; // @TODO slap
@@ -56,9 +66,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
             dagenTeScrapen.push(pushString);
             datumRef.setDate(datumRef.getDate() + 1);
         } while (datumRef < datumMax);
-        // lees map scrape-res/rechtbank
-        // pak laatst geschreven bestand & vergelijk op datum
-        // geef data terug die gescraped moeten worden
         return dagenTeScrapen;
     }
     /**
@@ -82,10 +89,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
      * @param datum
      */
     function scrapeDatum(datum) {
-        return new Promise((scrapeDatumSucces) => {
-            setTimeout(() => {
-                scrapeDatumSucces(datum);
-            }, 500);
+        return new Promise((scrapeDatumSucces, scrapeDatumFaal) => {
+            const route = datum.replace(/-/g, '').padEnd(14, '0') + '.json';
+            axios_1.default
+                .get(`https://insolventies.rechtspraak.nl/Services/BekendmakingenService/haalOp/${route}`)
+                .then((antwoord) => {
+                console.log(antwoord);
+            })
+                .catch((err) => {
+                console.log('TODO!!!');
+                scrapeDatumFaal(err);
+            });
         });
     }
 });

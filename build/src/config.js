@@ -11,13 +11,12 @@
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.config = void 0;
     const path_1 = require("path");
-    // let op geschreven voor de JS kant... zit dus in een build context
     exports.config = {
         pad: {
             db: path_1.resolve(`${__dirname}/../db`),
             nuts: path_1.resolve(`${__dirname}/nuts`),
             temp: path_1.resolve(`${__dirname}/temp`),
-            scrapeRes: path_1.resolve(`${__dirname}/../scrape-res`)
+            scrapeRes: path_1.resolve(`${__dirname}/../scrape-res`) // buiten build folder
         },
         opties: {
             toegestaneClusters: [

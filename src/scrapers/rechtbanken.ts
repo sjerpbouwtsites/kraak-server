@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import { config } from '../config';
-import { axios, axiosError } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
 /**
- * runner
+ * runner, uitgevoerd door index.ts
  */
 export default function rechtbankScrape() {
   const dagenTeScrapen = lijstDagenTeScrapen();
@@ -17,6 +17,12 @@ function routeNaarDatum(routeNaam: string) {
   );
 }
 
+/**
+ * lees map scrape-res/rechtbank
+ * pak laatst geschreven bestand & vergelijk op datum
+ * geef data terug die gescraped moeten worden
+ * data als YYYY-MM-DD
+ */
 function lijstDagenTeScrapen(): string[] {
   const rechtbankScraperRes = fs.readdirSync(
     `${config.pad.scrapeRes}/rechtbank`
@@ -38,9 +44,6 @@ function lijstDagenTeScrapen(): string[] {
     datumRef.setDate(datumRef.getDate() + 1);
   } while (datumRef < datumMax);
 
-  // lees map scrape-res/rechtbank
-  // pak laatst geschreven bestand & vergelijk op datum
-  // geef data terug die gescraped moeten worden
   return dagenTeScrapen;
 }
 
@@ -66,12 +69,19 @@ async function scrapeData(dagenTeScrapen: string[]) {
  * @param datum
  */
 function scrapeDatum(datum: string): Promise<string> {
-  return new Promise((scrapeDatumSucces) => {
-    // axios
-    // .get(
-    //   `https://insolventies.rechtspraak.nl/Services/BekendmakingenService/haalOp/${dag.route}`
-    // .then(r ))
-    //   scrapeDatumSucces(datum);
-    // }, 500);
+  return new Promise((scrapeDatumSucces, scrapeDatumFaal) => {
+    const route = datum.replace(/-/g, '').padEnd(14, '0') + '.json';
+
+    axios
+      .get(
+        `https://insolventies.rechtspraak.nl/Services/BekendmakingenService/haalOp/${route}`
+      )
+      .then((antwoord: AxiosResponse) => {
+        console.log(antwoord);
+      })
+      .catch((err: AxiosError) => {
+        console.log('TODO!!!');
+        scrapeDatumFaal(err);
+      });
   });
 }
