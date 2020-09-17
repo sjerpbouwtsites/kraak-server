@@ -1,0 +1,834 @@
+{
+  "Instanties": [
+    {
+      "PublicerendeInstantieOmschrijving": "Rechtbank Den Haag",
+      "Locaties": [
+        {
+          "LocatiecodeLocatie": null,
+          "Straat": "Prins Clauslaan",
+          "Huisnummer": "60",
+          "HuisnummerToevoeging": null,
+          "PlaatsNaam": null
+        }
+      ],
+      "Publicatieclusters": [
+        {
+          "PublicatieclusterOmschrijving": "rectificatie",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "R.17/141 G.J. Been, de pro forma verificatievergadering van 22 juni 2020 is verplaatst naar 3 augsutus 2020.",
+                    "R.17/142 G.J.M. Pieterse, de pro forma verificatievergadering van 22 juni 2020 is verplaatst naar 3 augustus 2020.",
+                    "R.17/212 D. de Jong, de verificatievergadering van 22 juni 2020 is niet door gegaan.",
+                    "R.17/213 M.M.M. van Baalen, de verificatievergadering van 22 juni 2020 is niet door gegaan."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "zittingen in faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "verificatievergadering",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "Verificatievergadering: pro forma op 14 september 2020 om 15:00 uur inzake (F.09/16/527), Zwolbloem B.V, corr.adr. Delkamp 22 3155GD Maasland, vest.adr. Nieuweweg 81 2675BG Honselersdijk, KvK: 27234867. Cur: mr E.A.H. ten Berge, Postbus 399 2670AK NAALDWIJK tel. 088-3368800. Uiterste datum van indiening vorderingen: 31 augustus 2020."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "einde schuldsaneringen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "met uitdeling en met schone lei",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "met uitdeling en met schone lei: op 18 juni 2020 inzake (R.9/17/59) Ghasem Hamzehloo, woonadr. Charlotte de Bourbonpln 32, 2595 VC 's-Gravenhage, geb. Teheran (Iran) 04 april 1967.",
+                    "met uitdeling en met schone lei: op 18 juni 2020 inzake (R.9/17/94) Sengül Nar, woonadr. Poldermolendreef 42, 2807 EN Gouda, geb. Izmir (Turkije) 26 februari 1971.",
+                    "met uitdeling en met schone lei: op 18 juni 2020 inzake (R.9/17/117) Tanja van de Werken, woonadr. Watergangpolderplein 24, 2807 MV Gouda, geb. Gouda 17 april 1979, voorheen hodn TSUNAMI BAR, vest.adr. Stoofsteeg 16, 2801 JR Gouda, KvK 24359278.",
+                    "met uitdeling en met schone lei: op 18 juni 2020 inzake (R.9/17/150) Walter Gaukaran Nakorikantodas, woonadr. Laan van Wateringse Veld 513, 2548 BM Den Haag, geb. Saramacca (Suriname) 12 januari 1950.",
+                    "met uitdeling en met schone lei: op 18 juni 2020 inzake (R.9/17/151) Soeroedjdee Matadin, woonadr. Laan van Wateringse Veld 513, 2548 BM Den Haag, geb. Commewijne (Suriname) 03 september 1951."
+                  ]
+                }
+              ]
+            },
+            {
+              "PublicatiesoortCaption": "zonder uitdeling en met schone lei",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "zonder uitdeling en met schone lei: op 18 juni 2020 inzake (R.9/17/138) Hatem Abdelazim Abdraboo, woonadr. Karmozijnstraat 21, 2284 GA Rijswijk, geb. Cairo (Egypte) 12 september 1965.",
+                    "zonder uitdeling en met schone lei: op 18 juni 2020 inzake (R.9/17/139) Nashwa Fathi Mohamed Ibrahiem, woonadr. Karmozijnstraat 21, 2284 GA Rijswijk, geb. Genin El Manakh Ibn Rashied (Egypte) 17 februari 1973.",
+                    "zonder uitdeling en met schone lei: op 18 juni 2020 inzake (R.9/17/182) Ilona Droog, woonadr. Serrestraat 30, 2671 RR Naaldwijk, geb. Delft 04 december 1982."
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "PublicerendeInstantieOmschrijving": "Rechtbank Gelderland",
+      "Locaties": [
+        {
+          "LocatiecodeLocatie": "Arnhem",
+          "Straat": "Walburgstraat",
+          "Huisnummer": "2-4",
+          "HuisnummerToevoeging": "",
+          "PlaatsNaam": "Arnhem"
+        },
+        {
+          "LocatiecodeLocatie": "Zutphen",
+          "Straat": "Martinetsingel",
+          "Huisnummer": "2",
+          "HuisnummerToevoeging": "",
+          "PlaatsNaam": "Zutphen"
+        }
+      ],
+      "Publicatieclusters": [
+        {
+          "PublicatieclusterOmschrijving": "rectificatie",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "De reeds vastgestelde datum 10 juli 2020 voor datum depot goedgekeurde slotuitdelingslijst is tot nader bericht uitgesteld. Zodra de nieuwe datum bekend is zal deze worden gepubliceerd."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "uitspraken faillissement",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "Uitspraak faillissement op 19 juni 2020 inzake (F.05/20/226) NewCom Shop B.V, vest.adr. Ampèrestraat 15 3861NC Nijkerk, KvK: 75190974 hodn NewCom Shop B.V. corr.adr. Ampèrestraat 15 3861NC Nijkerk, vest.adr. Ampèrestraat 15 3861NC Nijkerk. Cur: mr A.J. Stokkers, Postbus 442 6710BK EDE GLD tel. 0318-687878. RC: mr. S. Boot.",
+                    "Uitspraak faillissement op 19 juni 2020 inzake (F.05/20/227) Twyst Underwear B.V, vest.adr. Ampèrestraat 15 3861NC Nijkerk, KvK: 71197729 hodn Twyst Underwear B.V. corr.adr. Ampèrestraat 15 3861NC Nijkerk, vest.adr. Ampèrestraat 15 3861NC Nijkerk. Cur: mr A.J. Stokkers, Postbus 442 6710BK EDE GLD tel. 0318-687878. RC: mr. S. Boot.",
+                    "Uitspraak faillissement op 19 juni 2020 inzake (F.05/20/228) Wijnbroeders B.V, vest.adr. Ampèrestraat 15 3861NC Nijkerk, KvK: 69839999 hodn Wijnbroeders B.V. corr.adr. Ampèrestraat 15 3861NC Nijkerk, vest.adr. Ampèrestraat 15 3861NC Nijkerk. Cur: mr A.J. Stokkers, Postbus 442 6710BK EDE GLD tel. 0318-687878. RC: mr. S. Boot.",
+                    "Uitspraak faillissement op 19 juni 2020 inzake (F.05/20/229) Blenken Wijnimport B.V, vest.adr. Ampèrestraat 15 3861NC Nijkerk, KvK: 66639271 hodn Blenken Wijnimport B.V. corr.adr. Ampèrestraat 15 3861NC Nijkerk, vest.adr. Ampèrestraat 15 3861NC Nijkerk. Cur: mr A.J. Stokkers, Postbus 442 6710BK EDE GLD tel. 0318-687878. RC: mr. S. Boot."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "uitspraken schuldsanering",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "op 17 juni 2020 inzake (R.5/20/158) Atila Kaya, woonadr. Schubertstraat 18, 6961 AV Eerbeek, geb. Kayseri (Turkije) 23 mei 1971. Bwv: J.M.E. Wolbers, Postbus 10211, 7301 GE Apeldoorn, tel. 055-5215750. RC: mr. E. Schippers.",
+                    "op 17 juni 2020 inzake (R.5/20/159) Saziye Kaya, woonadr. Schubertstraat 18, 6961 AV Eerbeek, geb. Felahiye (Turkije) 20 mei 1973. Bwv: J.M.E. Wolbers, Postbus 10211, 7301 GE Apeldoorn, tel. 055-5215750. RC: mr. E. Schippers."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "vereenvoudigde afwikkeling faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "(F.05/18/341), The LS B.V. in liquidatie, vest.adr. Landjuweel 5 3905PE Veenendaal, KvK: 56229623. Cur: mr A.E. Mulder, Postbus 8.210 6710AE EDE GLD tel. 0318-743880. RC: mr. Schippers.",
+                    "(F.05/19/84), O. Öztürk, geb. Nijmegen 22 juli 1987. hodn Rebound Fiber Services vest.adr. Barbarossastraat 67 6522DK Nijmegen, KvK: 56170432. Cur: Mr. E.A.S. Jansen, Postbus 1.126 6501BC NIJMEGEN tel. 024-3810810. RC: mr. E Boerwinkel."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "zittingen in schuldsaneringen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "verificatievergadering en zitting beëindiging",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": "Zutphen",
+                  "Publicaties": [
+                    "verificatievergadering en zitting beëindiging: vergadering en zitting pro forma op 13 augustus 2020 om 14:00 uur inzake (R.5/16/744) Immanuel Jozua Pattiapon, woonadr. Vogelvlucht 83, 7332 CL Apeldoorn, KvK 52725448, geb. Epe 31 mei 1976, voorheen hodn I-J RECORDS. Bwv: A. Veldhuis, Postbus 10211, 7301 GE Apeldoorn, tel. 055-5215750."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "neerlegging slotuitdelingslijst in schuldsaneringen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": "Zutphen",
+                  "Publicaties": [
+                    "met ingang van 03 juli 2020 inzake (R.5/17/246) Ronald Hoekstra, woonadr. Reukgras 62, 8043 KM Zwolle, geb. Groningen 18 januari 1973."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "einde faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "vernietiging faillissement na verzet",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "Vernietiging faillissement na verzet op 19 juni 2020 inzake (F.05/20/219) A. Zwiers, woonadr. Gerard Doustraat 33 6717MG Ede, geb. Amsterdam (Nederland) 06 mei 1956. hodn Vloerenbedrijf A. Zwiers vest.adr. Gerard Doustraat 33 6717MG Ede, KvK: 63406713."
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "PublicerendeInstantieOmschrijving": "Rechtbank Limburg",
+      "Locaties": [
+        {
+          "LocatiecodeLocatie": "Maastricht",
+          "Straat": "St. Annadal",
+          "Huisnummer": "1",
+          "HuisnummerToevoeging": null,
+          "PlaatsNaam": "Maastricht"
+        },
+        {
+          "LocatiecodeLocatie": "Roermond",
+          "Straat": "Willem II Singel",
+          "Huisnummer": "67",
+          "HuisnummerToevoeging": null,
+          "PlaatsNaam": "Roermond"
+        }
+      ],
+      "Publicatieclusters": [
+        {
+          "PublicatieclusterOmschrijving": "faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "faillissement omgezet in schuldsanering",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "Op 23 juni 2020 inzake (F.03/18/92) E.P.C. de Lange, woonadr. Meidoornstraat 7 5922XM Venlo, geb. Venlo 01 februari 1966. voorheen hodn EPC Installatietechniek, KvK: 62180975. Cur: mr B.P.W. van Brink, Postbus 505 5900AM VENLO tel. 077-3545566. RC: mr. BRM de Bruijn. Dit faillissement is op 23 juni 2020 omgezet naar een schuldsaneringsregeling."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "rectificatie",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "Inzake R.03/18/6 THEODORUS FRANCISCUS HURKMANS,geboren: Helmond, 04-04-1970, is de beëindigingszitting van 18 juni 2020 gewijzigd naar 02 juli 2020 om 16:00 uur.",
+                    "Inzake R.03/18/7 CAROLINE LION, geboren: Maastricht, 11-11-1967, is de beëindigingszitting van 18 juni 2020 gewijzigd naar 02 juli 2020 om 16:00 uur."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "einde faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "wegens gebrek aan baten",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "Wegens gebrek aan baten op 23 juni 2020 inzake (F.04/12/350) Johnted Vastgoed B.V, vest.adr. L Janszoon Costerstr 39 5916PR Venlo, KvK: 12025301."
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "PublicerendeInstantieOmschrijving": "Rechtbank Midden-Nederland",
+      "Locaties": [
+        {
+          "LocatiecodeLocatie": "Almere",
+          "Straat": "De Diagonaal",
+          "Huisnummer": "37",
+          "HuisnummerToevoeging": null,
+          "PlaatsNaam": "Almere"
+        },
+        {
+          "LocatiecodeLocatie": "Lelystad",
+          "Straat": "Stationsplein",
+          "Huisnummer": "15",
+          "HuisnummerToevoeging": null,
+          "PlaatsNaam": "Lelystad"
+        },
+        {
+          "LocatiecodeLocatie": "Utrecht",
+          "Straat": "Vrouwe Justitiaplein",
+          "Huisnummer": "1",
+          "HuisnummerToevoeging": null,
+          "PlaatsNaam": "Utrecht"
+        }
+      ],
+      "Publicatieclusters": [
+        {
+          "PublicatieclusterOmschrijving": "neerlegging slotuitdelingslijst in faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": "Utrecht",
+                  "Publicaties": [
+                    "Met ingang van 30 juni 2020 inzake (F.16/17/330) Arduro b.v, vest.adr. Groenekanseweg 56 3732AG De Bilt, KvK: 30241252.",
+                    "Met ingang van 30 juni 2020 inzake (F.16/17/445) Schans Veenendaal B.V, vest.adr. Gelders Benedeneind 11 3907KW Veenendaal, KvK: 30149962.",
+                    "Met ingang van 30 juni 2020 inzake (F.16/18/528) IR 18 B.V, corr.adr. Prinses Marielaan 8 3743JA Baarn, vest.adr. Lepelaarstraat 2 3742XP Baarn, KvK: 32091236 hodn IR 18 B.V. corr.adr. Prinses Marielaan 8 3743JA Baarn, vest.adr. Lepelaarstraat 2 3742XP Baarn.",
+                    "Met ingang van 30 juni 2020 inzake (F.16/19/108) Vermeulen Schilders B.V, vest.adr. Schonauwen 134 3401HJ IJsselstein, KvK: 59624051 hodn Vermeulen Schilders B.V. corr.adr. Schonauwen 134 3401HJ IJsselstein, vest.adr. Schonauwen 134 3401HJ IJsselstein.",
+                    "Met ingang van 30 juni 2020 inzake (F.16/19/376) G.J. Kreeftmeijer, woonadr. Schaapstraat 41 3523RT Utrecht, geb. Utrecht 12 oktober 1969. hodn Schildersbedrijf QL vest.adr. Schaapstraat 41 3523RT Utrecht, KvK: 61430471.",
+                    "Met ingang van 30 juni 2020 inzake (F.16/19/504) M.R.W. de Vos, woonadr. Asschatterweg 70 3831JW Leusden, geb. Amersfoort (Nederland) 12 oktober 1982. hodn M.R.W. de Vos vest.adr. Waarden 25 b 3831HA Leusden, KvK: 67141994."
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "PublicerendeInstantieOmschrijving": "Rechtbank Noord-Nederland",
+      "Locaties": [
+        {
+          "LocatiecodeLocatie": "Assen",
+          "Straat": "Brinkstraat",
+          "Huisnummer": "4",
+          "HuisnummerToevoeging": null,
+          "PlaatsNaam": "Assen"
+        },
+        {
+          "LocatiecodeLocatie": "Groningen",
+          "Straat": "Guyotplein",
+          "Huisnummer": "1",
+          "HuisnummerToevoeging": null,
+          "PlaatsNaam": "Groningen"
+        },
+        {
+          "LocatiecodeLocatie": "Leeuwarden",
+          "Straat": "Zaailand",
+          "Huisnummer": "102",
+          "HuisnummerToevoeging": null,
+          "PlaatsNaam": "Leeuwarden"
+        }
+      ],
+      "Publicatieclusters": [
+        {
+          "PublicatieclusterOmschrijving": "vereenvoudigde afwikkeling faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "(F.18/16/139), Woldring Porselein B.V, vest.adr. Stedumermaar 10 9735AC Groningen, KvK: 02079101. Cur: mr P.T. Bakker, Postbus 9.420 9703LP GRONINGEN tel. 050-3136416. RC: mr. A.L. Goederee."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "zittingen in schuldsaneringen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "beëindigingszitting",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": "Assen",
+                  "Publicaties": [
+                    "beëindigingszitting: op 10 juli 2020 inzake (R.18/17/211) Albert Jan Groenewoud, woonadr. Mussenveld 38, 7827 AC Emmen, geb. Apeldoorn 10 juli 1965. Bwv: V.R. Besier, Lunet 66, 7823 VV Emmen, tel. 0591-658084.",
+                    "beëindigingszitting: op 17 juli 2020 inzake (R.18/17/572) Meindert Dinand Beekhuis, woonadr. Bosboom-Toussaintstraat 27 a, 9721 RE Groningen, geb. Beilen 06 april 1972, hodn EIKENHORST HOOGHALEN ZUID. Bwv: mr. G.M. Tiddens, Postbus 7015, 9701 JA Groningen, tel. 050-3140840.",
+                    "beëindigingszitting: op 17 juli 2020 inzake (R.18/17/574) Berend Selles, woonadr. Boerschaplaan 46, 7824 NE Emmen, geb. Emmen 25 september 1970. Bwv: E.F.J. Boxem, Postbus 2231, 7801 CE Emmen, tel. 0591-686360.",
+                    "beëindigingszitting: op 17 juli 2020 inzake (R.18/17/575) Petra Cornelia Maria Boeter, woonadr. Hesselterbrink 452, 7812 EL Emmen, geb. Hontenisse 30 mei 1970. Bwv: E.F.J. Boxem, Postbus 2231, 7801 CE Emmen, tel. 0591-686360.",
+                    "beëindigingszitting: op 17 juli 2020 inzake (R.18/17/583) Hendrik Katrines de Roo, woonadr. Laan van het Kinholt 344, 7823 HJ Emmen, geb. Emmen 15 december 1964. Bwv: A. Veenstra, Ermerweg 88 D, 7812 BG Emmen, tel. 0591-820281.",
+                    "beëindigingszitting: op 17 juli 2020 inzake (R.18/17/584) Klaasje Groen, woonadr. Laan van het Kinholt 344, 7823 HJ Emmen, geb. Emmen 24 september 1967. Bwv: A. Veenstra, Ermerweg 88 D, 7812 BG Emmen, tel. 0591-820281.",
+                    "beëindigingszitting: op 24 juli 2020 inzake (R.18/17/593) Antje Margaretha Dijkstra, woonadr. Jura 7, 1567 KG Assendelft, geb. Steenwijk 19 mei 1966. Bwv: C.A. Hassink, Postbus 2231, 7801 CE Emmen, tel. 0591-686360.",
+                    "beëindigingszitting: op 24 juli 2020 inzake (R.18/17/594) Johan Heinrich Gerardus van Hebel, woonadr. Zuiderdiep 36, 7876 AB Valthermond, KvK 01124719, geb. Emmen 08 april 1962, voorheen hodn HEBEL KLUS. Bwv: C.A. Hassink, Postbus 2231, 7801 CE Emmen, tel. 0591-686360."
+                  ]
+                },
+                {
+                  "LocatiecodeBekendmaking": "Groningen",
+                  "Publicaties": [
+                    "beëindigingszitting: op 24 juli 2020 inzake (R.18/17/595) Johannes Groenen, woonadr. 't Veer 39, 9351 DG Leek, geb. Utrecht 27 oktober 1947. Bwv: mr. C.H.J. van der Maas, Postbus 30, 9750 AA Haren Gn, tel. 050-5375010.",
+                    "beëindigingszitting: op 24 juli 2020 inzake (R.18/17/596) Gertie Leeflang, woonadr. 't Veer 39, 9351 DG Leek, geb. 's-Gravenhage 11 januari 1967. Bwv: mr. C.H.J. van der Maas, Postbus 30, 9750 AA Haren Gn, tel. 050-5375010.",
+                    "beëindigingszitting: op 24 juli 2020 inzake (R.18/17/600) Brian Orlando Oehlers, woonadr. Bekemaheerd 60, 9737 PV Groningen, geb. Paramaribo (Suriname) 28 juli 1973. Bwv: mr. J.D. Meerburg, Westersingel 49, 9718 CE Groningen, tel. 050-3185286.",
+                    "beëindigingszitting: op 24 juli 2020 inzake (R.18/17/601) Naomi Marion Thijm, woonadr. Bekemaheerd 60, 9737 PV Groningen, geb. Paramaribo (Suriname) 10 september 1977, voorheen hodn NAOMI'S BEAUTY, vest.adr. Bekemaheerd 60, 9737 PV Groningen, KvK Groningen 01125257. Bwv: mr. J.D. Meerburg, Westersingel 49, 9718 CE Groningen, tel. 050-3185286.",
+                    "beëindigingszitting: op 24 juli 2020 inzake (R.18/18/288) Jan Post, woonadr. Vuurdoornweg 22, 9674 KB Winschoten, geb. Midwolda 09 mei 1966. Bwv: F. Hiemstra, Postbus 4060, 9701 EB Groningen, tel. 050-2110494.",
+                    "beëindigingszitting: op 17 juli 2020 inzake (R.18/19/304) Aukien Sjaakje Ellechediena Fennechien Boer, woonadr. Vloedweg 35, 9628 BL Siddeburen, geb. Groningen 15 december 1968. Bwv: mr. C.H.J. van der Maas, Postbus 30, 9750 AA Haren Gn, tel. 050-5375010."
+                  ]
+                }
+              ]
+            },
+            {
+              "PublicatiesoortCaption": "verificatievergadering",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": "Assen",
+                  "Publicaties": [
+                    "verificatievergadering: pro forma op 22 juli 2020 inzake (R.18/17/677) Annius Groenink, woonadr. Weidelint 14, 7948 CG Nijeveen, geb. Steenwijkerwold 28 maart 1964. Bwv: S. Cisci, Postbus 1568, 9701 BN Groningen, tel. 050 - 8200223.",
+                    "verificatievergadering: pro forma op 22 juli 2020 inzake (R.18/17/680) Rolf op 't Zand, woonadr. Eendrachtstraat 18, 7941 AP Meppel, geb. Hengelo 18 april 1973, voorheen hodn CLEAR VISION CLEANING. Bwv: J. Koster, Postbus 1374, 9701 BJ Groningen, tel. 050-3135154.",
+                    "verificatievergadering: pro forma op 22 juli 2020 inzake (R.18/17/681) Nadya Soraya Alexandra Vorsterman van Oijen, woonadr. Eendrachtstraat 18, 7941 AP Meppel, geb. Hattem 29 januari 1977. Bwv: J. Koster, Postbus 1374, 9701 BJ Groningen, tel. 050-3135154."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "neerlegging slotuitdelingslijst in faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": "Leeuwarden",
+                  "Publicaties": [
+                    "Met ingang van 08 juli 2020 inzake (F.17/11/218) A. van der Wal, woonadr. Steenwijkerweg 49 8471KZ Wolvega, geb. Idaarderadeel 22 mei 1941, overleden 29 september 2018."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "neerlegging slotuitdelingslijst in schuldsaneringen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": "Assen",
+                  "Publicaties": [
+                    "met ingang van 30 juni 2020 inzake (R.18/17/430) Wilhelmina Bol, woonadr. Hingstakkers 15, 9411 NN Beilen, geb. Assen 05 april 1959."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "einde faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "wegens gebrek aan baten",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "Wegens gebrek aan baten op 23 juni 2020 inzake (F.17/12/23) J.B. Timmerwerken B.V, corr.adr. Postbus 65 8560AB Balk, vest.adr. Eigen Haard 25 8561EX Balk, KvK: 01107272."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "einde schuldsaneringen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "met uitdeling en met schone lei",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "met uitdeling en met schone lei: op 05 juni 2020 inzake (R.18/17/397) Gerben Hotzes, woonadr. Roerdompstraat 1, 9607 RS Foxhol, geb. Hoogezand-Sappemeer 26 mei 1988."
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "PublicerendeInstantieOmschrijving": "Rechtbank Overijssel",
+      "Locaties": [
+        {
+          "LocatiecodeLocatie": "Almelo",
+          "Straat": "Egbert Gorterstraat",
+          "Huisnummer": "5",
+          "HuisnummerToevoeging": "",
+          "PlaatsNaam": "Almelo"
+        },
+        {
+          "LocatiecodeLocatie": "Zwolle",
+          "Straat": "Schuurmanstraat",
+          "Huisnummer": "2",
+          "HuisnummerToevoeging": "",
+          "PlaatsNaam": "Zwolle"
+        }
+      ],
+      "Publicatieclusters": [
+        {
+          "PublicatieclusterOmschrijving": "einde faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "door verbindende uitdelingslijst",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "Door verbindende uitdelingslijst op 23 juni 2020 inzake (F.08/16/90) Lerila De Vrolijkheid B.V, vest.adr. Oude Meppelerweg 1 -3 8024AB Zwolle, KvK: 05059225 hodn De Vrolijkheid."
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "PublicerendeInstantieOmschrijving": "Rechtbank Rotterdam",
+      "Locaties": [
+        {
+          "LocatiecodeLocatie": "Dordrecht",
+          "Straat": "Steegoversloot",
+          "Huisnummer": "36",
+          "HuisnummerToevoeging": null,
+          "PlaatsNaam": "Dordrecht"
+        },
+        {
+          "LocatiecodeLocatie": "Rotterdam",
+          "Straat": "Wilhelminaplein",
+          "Huisnummer": "100-125",
+          "HuisnummerToevoeging": null,
+          "PlaatsNaam": "Rotterdam"
+        }
+      ],
+      "Publicatieclusters": [
+        {
+          "PublicatieclusterOmschrijving": "uitspraken schuldsanering",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "Uitspraak schuldsanering op 22 juni 2020 inzake (R.10/20/199) V.B.A. Dijksteel, woonadr. Hoogstraat 157 B 3111HG Schiedam, geb. Paramaribo (Suriname) 08 december 1978. Bwv: mr W.P. Groenendijk, Postbus 324 3330AH ZWIJNDRECHT tel. 078-6125911. RC: mr. C. Prenger.",
+                    "op 22 juni 2020 inzake (R.10/20/200) Henna Julia Daal, woonadr. Lunenburgdam 1, 3077 EN Rotterdam, geb. Aruba (Nederlandse Antillen) 22 december 1974, voorheen hodn H.J. Daal. Bwv: R. de Geus, Postbus 187, 3330 AD Zwijndrecht, tel. 078-7999944. RC: mr. C.G.E. Prenger.",
+                    "op 22 juni 2020 inzake (R.10/20/201) Erwin Raymond Neiden, woonadr. Horsweg 19, 3192 ED Hoogvliet Rotterdam, geb. Rotterdam 07 april 1968. Bwv: T.P.F. Eisses, Postbus 187, 3330 AD Zwijndrecht, tel. 078-7999922. RC: mr. C.G.E. Prenger.",
+                    "op 22 juni 2020 inzake (R.10/20/202) Audrey Metha Stenhuijs, woonadr. Horsweg 19, 3192 ED Hoogvliet Rotterdam, geb. Rotterdam 12 augustus 1978. Bwv: T.P.F. Eisses, Postbus 187, 3330 AD Zwijndrecht, tel. 078-7999922. RC: mr. C.G.E. Prenger."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "vereenvoudigde afwikkeling faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "(F.10/16/631), HTM Infra Services B.V, vest.adr. Struitenweg 33 A 3082WR Rotterdam, KvK: 09082621. Cur: mr R.W.F. Heijmeriks, Postbus 752 3200AS SPIJKENISSE tel. 0181-625255. RC: mr. B.A. Cnossen.",
+                    "(F.10/18/489), Logistic Centre Rotterdam B.V, vest.adr. Albert Plesmanweg 151 3088GC Rotterdam, KvK: 24309731 hodn Logistic Centre Rotterdam B.V. corr.adr. Albert Plesmanweg 151 3088GC Rotterdam, vest.adr. Albert Plesmanweg 151 3088GC Rotterdam. Cur: mr S.A. Hattink, Postbus 29.215 3001GE ROTTERDAM tel. 010-2811811. RC: mr. W.J. Roos-van Toor."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "zittingen in schuldsaneringen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "beëindigingszitting",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": "Rotterdam",
+                  "Publicaties": [
+                    "beëindigingszitting: op 13 juli 2020 inzake (R.10/17/245) Charlene Lucinda Aries, woonadr. Ring 391, 3195 XH Rotterdam, geb. Rotterdam 27 november 1979. Bwv: M. Smit, Postbus 81145, 3009 GC Rotterdam, tel. 088-7624225.",
+                    "beëindigingszitting: op 13 juli 2020 om 12:30 uur inzake (R.10/17/595) Yolanda Cara Zwaans, woonadr. Aalscholverlaan 614, 3136 KV Vlaardingen, geb. Vlaardingen 08 januari 1989. Bwv: N.T. van den Deijssel, Postbus 81145, 3009 GC Rotterdam, tel. 088-7624225."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "neerlegging slotuitdelingslijst in schuldsaneringen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": "Dordrecht",
+                  "Publicaties": [
+                    "met ingang van 21 juli 2020 inzake (R.10/17/137) Hassania El Moussati, woonadr. Molenpolder 156, 3453 NZ De Meern, geb. Temsamane (Marokko) 05 november 1973."
+                  ]
+                },
+                {
+                  "LocatiecodeBekendmaking": "Rotterdam",
+                  "Publicaties": [
+                    "met ingang van 24 juli 2020 inzake (R.10/16/382) Nestor Esteban Clemencia, woonadr. Moliereweg 80, 3076 GJ Rotterdam, geb. Curaçao (Nederlandse Antillen) 02 september 1965.",
+                    "met ingang van 24 juli 2020 inzake (R.10/17/422) Yasemin Akansel, woonadr. Boogjes 46, 3075 TB Rotterdam, geb. Sakarya (Turkije) 28 februari 1978.",
+                    "met ingang van 24 juli 2020 inzake (R.10/17/456) Sükrü Özgen Kirbuga, woonadr. Maasstraat 20, 2652 DD Berkel en Rodenrijs, geb. Kirsehir (Turkije) 05 januari 1967.",
+                    "met ingang van 24 juli 2020 inzake (R.10/17/457) Emine Kirbuga, woonadr. Maasstraat 20, 2652 DD Berkel en Rodenrijs, geb. Adana (Turkije) 07 januari 1974.",
+                    "met ingang van 24 juli 2020 inzake (R.10/17/463) Kitwing Kan, woonadr. Alblas 34, 2991 RA Barendrecht, geb. Hoorn 13 januari 1984.",
+                    "met ingang van 24 juli 2020 inzake (R.10/17/468) Syran Vichal Amier, woonadr. Tollensstraat 53 D, 3035 NC Rotterdam, geb. Paramaribo (Suriname) 25 april 1988.",
+                    "met ingang van 24 juli 2020 inzake (R.10/17/469) Eloy Amando Alenton York, woonadr. Duyststraat 44 d, 3023 EG Rotterdam, geb. Sint Maarten (Nederlandse Antillen) 20 december 1988."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "einde faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "wegens gebrek aan baten",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "Wegens gebrek aan baten op 16 juni 2020 inzake (F.10/19/80) D. van Kempen, woonadr. Jan Pettersonstraat 248 3077MN Rotterdam, geb. Vlaardingen 09 april 1960."
+                  ]
+                }
+              ]
+            },
+            {
+              "PublicatiesoortCaption": "door verbindende uitdelingslijst",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "Door verbindende uitdelingslijst op 20 juni 2020 inzake (F.10/16/101) B.M. du Bosc, woonadr. IJsdans 13 2907AZ Capelle aan den IJssel, geb. 's-Gravenhage (Nederland) 25 juni 1965.",
+                    "Door verbindende uitdelingslijst op 20 juni 2020 inzake (F.10/16/546) A.A. Korevaar, woonadr. Watersnip 10 3371JR Hardinxveld-Giessendam, geb. Hardinxveld-Giessendam 11 mei 1974."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "einde schuldsaneringen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "met uitdeling en met schone lei",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "met uitdeling en met schone lei: op 20 juni 2020 inzake (R.10/16/459) Madeline Marciana Geertruida, woonadr. Van Drielpad 16, 3195 BC Rotterdam, geb. Curacao (Nederlandse Antillen) 11 november 1979.",
+                    "met uitdeling en met schone lei: op 20 juni 2020 inzake (R.10/16/685) Ginsteny Maria Valeria van de Kamp, woonadr. Oostkousdijk 13 B, 3024 CK Rotterdam, geb. Almere 29 juli 1993.",
+                    "met uitdeling en met schone lei: op 20 juni 2020 inzake (R.10/16/778) Cicilia Isabel 't Zand, woonadr. Van Heusdestraat 37 B, 3023 RN Rotterdam, geb. Arnhem 16 juli 1991.",
+                    "met uitdeling en met schone lei: op 20 juni 2020 inzake (R.10/16/943) Mileiny Dielingen Soriano, woonadr. Juliana van Stolberglaan 50, 3181 HH Rozenburg, geb. Santo Domingo (Dominicaanse Republiek) 25 augustus 1982.",
+                    "met uitdeling en met schone lei: op 20 juni 2020 inzake (R.10/17/365) Sabah Talouka, geheim adres, geb. Rotterdam 06 februari 1987, voorheen hodn SAPJE, vest.adr. Dempostraat 62, 3029 CM Rotterdam, KvK 53602552"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "PublicerendeInstantieOmschrijving": "Rechtbank Zeeland-West-Brabant",
+      "Locaties": [
+        {
+          "LocatiecodeLocatie": "Breda",
+          "Straat": "Stationslaan",
+          "Huisnummer": "10",
+          "HuisnummerToevoeging": null,
+          "PlaatsNaam": "Breda"
+        },
+        {
+          "LocatiecodeLocatie": "Middelburg",
+          "Straat": "Kousteensedijk",
+          "Huisnummer": "2",
+          "HuisnummerToevoeging": null,
+          "PlaatsNaam": "Middelburg"
+        }
+      ],
+      "Publicatieclusters": [
+        {
+          "PublicatieclusterOmschrijving": "rectificatie",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "betreft R.02/17/329: Per abuis is op 28 mei 2020 gepubliceerd dat de regeling is geëindigd met uitdeling en schone lei. Echter is de regeling geëindigd zonder uitdeling en met schone lei."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "vereenvoudigde afwikkeling faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "(F.02/17/265), SKB Onroerend Goed B.V, vest.adr. Vierlinghstraat 22 4251LC Werkendam, KvK: 18088006. Cur: mr J.L.G.M. Verwiel, Postbus 5.660 4801EB BREDA tel. 076-5236070. RC: mr. M.D.E. Leppens.",
+                    "(F.02/17/287), Zwets Werkendam B.V, vest.adr. Vierlinghstraat 22 4251LC Werkendam, KvK: 18071638. Cur: mr J.L.G.M. Verwiel, Postbus 5.660 4801EB BREDA tel. 076-5236070. RC: mr. M.D.E. Leppens."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "zittingen in schuldsaneringen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "verificatievergadering",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": "Breda",
+                  "Publicaties": [
+                    "Verificatievergadering: pro forma op 03 augustus 2020 om 13:00 uur inzake (R.02/15/750), H.C. Goossens, woonadr. Piusplein 128 4621EP Bergen op Zoom, geb. Steenbergen (Nederland) 04 december 1960. Bwv: M. Klarenbeek (Verkerk & Vos Bewindvoeringen), Postbus 6 2957ZG Nieuw-Lekkerland tel. 0184-683900.",
+                    "Verificatievergadering: pro forma op 03 augustus 2020 om 13:00 uur inzake (R.02/15/751), C.W. Lint, woonadr. Piusplein 128 4621EP Bergen op Zoom, geb. Bergen op Zoom (Nederland) 09 oktober 1964. Bwv: M. Klarenbeek (Verkerk & Vos Bewindvoeringen), Postbus 6 2957ZG Nieuw-Lekkerland tel. 0184-683900."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "neerlegging slotuitdelingslijst in faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": null,
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": "Breda",
+                  "Publicaties": [
+                    "met ingang van 29 juni 2020 inzake (F.2/19/335) Ionut STEFAN, woonadr. Helstraat 4, 4885 KG Achtmaal, geb. Boekarest (Roemenië) 30 november 1983.",
+                    "met ingang van 29 juni 2020 inzake (F.2/19/336) Nicoleta GHIUTA, woonadr. Helstraat 4, 4885 KG Achtmaal, geb. Onesti (Roemenië) 24 december 1985."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "einde faillissementen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "door verbindende uitdelingslijst",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "Door verbindende uitdelingslijst op 19 juni 2020 inzake (F.02/16/555) P.E.A.M. Aarts, woonadr. Burg Van den Oeverstraat 10 5076GL Haaren, geb. Tilburg 21 september 1966. hodn 't dorpje corr.adr. Laarstraat 4 5025VK Tilburg, vest.adr. Dorpstraat 12 5133AG Riel, KvK: 18065458.",
+                    "Door verbindende uitdelingslijst op 19 juni 2020 inzake (F.02/18/319) Schilderwerken Antonissen Breda B.V, vest.adr. Neerhof 4 4847BS Teteringen, KvK: 20051861 hodn Schilderwerken Antonissen Breda B.V. corr.adr. Neerhof 4 4847BS Teteringen, vest.adr. Neerhof 4 4847BS Teteringen."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "PublicatieclusterOmschrijving": "einde schuldsaneringen",
+          "Publicatiesoorten": [
+            {
+              "PublicatiesoortCaption": "omdat alle vorderingen zijn voldaan",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "omdat alle vorderingen zijn voldaan: op 19 juni 2020 inzake (R.2/17/241) Johannes Wilhelmus van LIEROP, woonadr. Demerstraat 18, 4812 VS Breda, geb. Helmond 15 februari 1974.",
+                    "omdat alle vorderingen zijn voldaan: op 19 juni 2020 inzake (R.2/17/242) Wilhelmina Petronella Johanna van DIJKE e/v VAN LIEROP, woonadr. Demerstraat 18, 4812 VS Breda, geb. Breda 10 januari 1980."
+                  ]
+                }
+              ]
+            },
+            {
+              "PublicatiesoortCaption": "met uitdeling en met schone lei",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "met uitdeling en met schone lei: op 12 juni 2020 inzake (R.2/17/54) Josephine Lilian Maria GOVERS, woonadr. Wattstraat 7, 4816 CD Breda, geb. Goirle 25 maart 1971.",
+                    "met uitdeling en met schone lei: op 12 juni 2020 inzake (R.2/17/92) Cornelia Elisabeth Geertruida BLOOS, woonadr. Afgeslechtedijk 51, 4651 RK Steenbergen, geb. Alkmaar 28 december 1972.",
+                    "met uitdeling en met schone lei: op 12 juni 2020 inzake (R.2/17/170) Gustaaf Harry Friedrich TRIELING, woonadr. Taxandrialaan 33, 5283 MA Boxtel, geb. Boxtel 06 november 1968, hodn GJ DESIGN V.O.F.; GJ DESIGN."
+                  ]
+                }
+              ]
+            },
+            {
+              "PublicatiesoortCaption": "zonder uitdeling en met schone lei",
+              "PublicatiesNaarLocatie": [
+                {
+                  "LocatiecodeBekendmaking": null,
+                  "Publicaties": [
+                    "zonder uitdeling en met schone lei: op 15 juni 2020 inzake (R.2/15/611) Johanna Martina Goverdina Wilhelmina TRAATS, woonadr. Leeuwerikstraat 121, 4711 JC St. Willebrord, geb. Oudenbosch 05 februari 1972.",
+                    "zonder uitdeling en met schone lei: op 15 juni 2020 inzake (R.2/17/265) Wilhelmina Hendrika de VOS, woonadr. Kastanjelaan 52, 4902 RN Oosterhout, geb. Oosterhout 08 januari 1976.",
+                    "zonder uitdeling en met schone lei: op 15 juni 2020 inzake (R.2/17/266) Tiziana de MATTEIS, woonadr. Piet van Haarenstraat 40, 5022 CS Tilburg, geb. Milaan (Italië) 12 april 1964."
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "Datum": "/Date(1592863200000)/"
+}
