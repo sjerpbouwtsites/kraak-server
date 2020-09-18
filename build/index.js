@@ -1,21 +1,21 @@
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 (function (factory) {
     if (typeof module === "object" && typeof module.exports === "object") {
         var v = factory(require, exports);
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "./scrapers/rechtbanken"], factory);
+        define(["require", "exports", "./kraak-worker"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const rechtbanken_1 = __importDefault(require("./scrapers/rechtbanken"));
+    const kraak_worker_1 = require("./kraak-worker");
     nodeVersieControle();
     async function init() {
-        rechtbanken_1.default();
+        const rechtbankScraper = new kraak_worker_1.KraakWorker('./build/scrapers/rechtbanken.js');
+        // rechtbankScraper.on('message', (e) => {
+        //   console.log(e);
+        // });
         // draai varia scrapers
         // try {
         //   const installatie = pakScript("installatie");

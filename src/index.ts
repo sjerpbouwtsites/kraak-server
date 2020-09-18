@@ -1,9 +1,13 @@
-import rechtbankScrape from './scrapers/rechtbanken';
+import { KraakWorker } from './kraak-worker';
 
 nodeVersieControle();
 
 async function init() {
-  rechtbankScrape();
+  const rechtbankScraper = new KraakWorker('./build/scrapers/rechtbanken.js');
+
+  // rechtbankScraper.on('message', (e) => {
+  //   console.log(e);
+  // });
 
   // draai varia scrapers
   // try {
