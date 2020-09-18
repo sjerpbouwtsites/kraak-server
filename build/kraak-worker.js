@@ -9,7 +9,7 @@
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.workerOpExit = exports.KraakWorker = void 0;
+    exports.KraakWorker = void 0;
     const worker_threads_1 = require("worker_threads");
     /**
      * Leeft in de master thread context.
@@ -30,11 +30,7 @@
                 if (bericht.type === 'console') {
                     console.log(`
         ${this.workerNaam} worker
-        ${bericht.data}
-        `);
-                }
-                else {
-                    throw new Error('onduidelijk bericht');
+        ${bericht.data}`);
                 }
             });
         }
@@ -44,14 +40,4 @@
         }
     }
     exports.KraakWorker = KraakWorker;
-    function workerOpExit(self) {
-        self.on('exit', () => {
-            worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                workerNaam: 'FIX ME LATER',
-                type: 'console',
-                data: `worker op ??? gestopt`
-            });
-        });
-    }
-    exports.workerOpExit = workerOpExit;
 });

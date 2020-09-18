@@ -4,10 +4,7 @@ nodeVersieControle();
 
 async function init() {
   const rechtbankScraper = new KraakWorker('./build/scrapers/rechtbanken.js');
-
-  // rechtbankScraper.on('message', (e) => {
-  //   console.log(e);
-  // });
+  rechtbankScraper.postMessage('init');
 
   // draai varia scrapers
   // try {

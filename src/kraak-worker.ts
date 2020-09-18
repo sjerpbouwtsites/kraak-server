@@ -21,10 +21,7 @@ export class KraakWorker extends Worker {
       if (bericht.type === 'console') {
         console.log(`
         ${this.workerNaam} worker
-        ${bericht.data}
-        `);
-      } else {
-        throw new Error('onduidelijk bericht');
+        ${bericht.data}`);
       }
     });
   }
@@ -34,21 +31,21 @@ export class KraakWorker extends Worker {
   }
 }
 
-export function workerOpExit(self: any) {
-  self.on('exit', () => {
-    parentPort?.postMessage({
-      workerNaam: 'FIX ME LATER', //TODO
-      type: 'console',
-      data: `worker op ??? gestopt`
-    });
-  });
-}
+// export function workerOpExit(self: any) {
+//   self.on('exit', () => {
+//     parentPort?.postMessage({
+//       workerNaam: 'FIX ME LATER', //TODO
+//       type: 'console',
+//       data: `worker op ??? gestopt`
+//     });
+//   });
+//}
 
 export interface KraakWorkerBerichtVanWorker extends KraakWorkerBericht {
   workerNaam?: string | null;
 }
 
 export interface KraakWorkerBericht {
-  type: 'console' | null;
-  data: any;
+  type: 'console' | 'init' | null;
+  data?: any;
 }
