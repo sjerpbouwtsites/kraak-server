@@ -38,7 +38,6 @@ function lijstDagenTeScrapen(): string[] {
   let datumRef = routeNaarDatum(laatsteScrape);
   datumRef.setDate(datumRef.getDate() + 1); // vanaf dag ná laatste scrape gaan kijken
   do {
-    console.log(datumRef);
     const pushString = datumRef.toISOString().replace(/-/g, '').substring(0, 8);
     dagenTeScrapen.push(pushString);
     datumRef.setDate(datumRef.getDate() + 1);
@@ -56,32 +55,92 @@ async function scrapeData(dagenTeScrapen: string[]) {
   if (!scrapeDag) {
     return true;
   }
-  do {
-    const scrapeAns = await scrapeDatum(scrapeDag);
-    console.log(scrapeAns);
-    // TODO verwerk antwoord
-    scrapeDag = dagenTeScrapen.shift();
-  } while (scrapeDag);
+  try {
+    do {
+      const scrapeAns = await scrapeDatum(scrapeDag);
+      console.log(scrapeAns);
+      // TODO verwerk antwoord
+      scrapeDag = dagenTeScrapen.shift();
+    } while (scrapeDag);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 /**
  * Scraped losse datum & schrijft die weg
  * @param datum
  */
-function scrapeDatum(datum: string): Promise<string> {
+function scrapeDatum(datum: string): Promise<scrapeDatumAns> {
   return new Promise((scrapeDatumSucces, scrapeDatumFaal) => {
-    const route = datum.replace(/-/g, '').padEnd(14, '0') + '.json';
+    const route = datum.replace(/-/g, '').padEnd(14, '0');
+    const url = `https://insolventies.rechtspraak.nl/Services/BekendmakingenService/haalOp/${route}`;
 
     axios
-      .get(
-        `https://insolventies.rechtspraak.nl/Services/BekendmakingenService/haalOp/${route}`
-      )
+      .get(url)
       .then((antwoord: AxiosResponse) => {
-        console.log(antwoord);
+        return antwoord.data;
+      })
+      .then((jsonBlob: RechtbankJSON) => {
+        if (!instanceOfRechtbankJSON(jsonBlob)) {
+          // TODO debug die data ergens heen
+          throw new Error(
+            'rechtbank JSON geen RechtbankJSON instance. antwoord in temp map'
+          );
+        }
+
+        if (jsonBlob.Instanties.length === 0) {
+          const rechtbankMeta = JSON.parse(
+            fs.readFileSync(
+              `${config.pad.scrapeRes}/meta/rechtbankmeta.json`,
+              'utf-8'
+            )
+          );
+          rechtbankMeta.legeResponses.push(route);
+          fs.writeFileSync(
+            `${config.pad.scrapeRes}/meta/rechtbankmeta.json`,
+            JSON.stringify(rechtbankMeta)
+          );
+          scrapeDatumSucces({
+            type: 'leeg',
+            route: route
+          });
+        } else {
+          const opslagPad = `${config.pad.scrapeRes}/rechtbank/${route}.json`;
+          fs.writeFile(opslagPad, JSON.stringify(jsonBlob), () => {
+            scrapeDatumSucces({
+              type: 'gevuld',
+              route: route
+            });
+          });
+        }
       })
       .catch((err: AxiosError) => {
         console.log('TODO!!!');
         scrapeDatumFaal(err);
       });
   });
+}
+interface scrapeDatumAns {
+  type: 'leeg' | 'gevuld';
+  route: string;
+}
+interface RechtbankJSON {
+  Instanties: [];
+}
+
+/**
+ *
+ * @param jsonBlob
+ * @returns boolean
+ * Wie maakt er nu een 'typed' versie van JS als compileertaal terwijl
+ * JS in essentie een in de browser geinterpreteerde taal is?
+ * Mensen die nooit antwoorden krijgen van servers.
+ *
+ */
+function instanceOfRechtbankJSON(jsonBlob: object): boolean {
+  if (!jsonBlob.hasOwnProperty('Instanties')) {
+    return false;
+  }
+  return true;
 }
