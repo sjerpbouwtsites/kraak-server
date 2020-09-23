@@ -2,12 +2,17 @@ import { parentPort, workerData } from 'worker_threads';
 import * as fs from 'fs';
 import { config } from '../config';
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import { KraakBerichtAanWorker } from '../kraak-worker';
 
-parentPort?.on('message', (msg: any) => {
-  if (msg === 'init') {
+/**
+ * TODO BESTANDSBESCHRIJVING
+ */
+
+parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
+  if (bericht.type === 'start') {
     initScraper();
   }
-  if (msg === 'exit') {
+  if (bericht.type === 'stop') {
     process.exit();
   }
 });

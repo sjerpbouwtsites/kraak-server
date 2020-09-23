@@ -4,7 +4,11 @@ nodeVersieControle();
 
 async function init() {
   const rechtbankScraper = new KraakWorker('./build/scrapers/rechtbanken.js');
-  rechtbankScraper.postMessage('init');
+  const faillissementenLezer = new KraakWorker(
+    './build/secundair/faillezer.ts'
+  );
+  rechtbankScraper.berichtAanWorker({ type: 'start' });
+  rechtbankScraper.on('message', () => {});
 
   // draai varia scrapers
   // try {
