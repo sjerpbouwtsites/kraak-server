@@ -14,9 +14,6 @@
     async function init() {
         const rechtbankScraper = new kraak_worker_1.KraakWorker('./build/scrapers/rechtbanken.js');
         rechtbankScraper.postMessage('init');
-        // rechtbankScraper.on('message', (e) => {
-        //   console.log(e);
-        // });
         // draai varia scrapers
         // try {
         //   const installatie = pakScript("installatie");

@@ -5,27 +5,33 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 
 parentPort?.on('message', (msg: any) => {
   if (msg === 'init') {
-    const dagenTeScrapen = lijstDagenTeScrapen();
-    scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {
-      if (scrapeExitBoodschap === true) {
-        parentPort?.postMessage({
-          type: 'console',
-          data: `ik ben klaar`
-        });
-        process.exit();
-      } else {
-        parentPort?.postMessage({
-          type: 'console',
-          data: `ik heb een onverklaard probleem`
-        });
-      }
-    });
+    initScraper();
   }
   if (msg === 'exit') {
     process.exit();
   }
 });
 
+/**
+ * initialisatiefunctie aangeroepen door message eventhandler.
+ */
+function initScraper() {
+  const dagenTeScrapen = lijstDagenTeScrapen();
+  scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {
+    if (scrapeExitBoodschap === true) {
+      parentPort?.postMessage({
+        type: 'console',
+        data: `ik ben klaar`
+      });
+      process.exit();
+    } else {
+      parentPort?.postMessage({
+        type: 'console',
+        data: `ik heb een onverklaard probleem`
+      });
+    }
+  });
+}
 function routeNaarDatum(routeNaam: string) {
   const d = routeNaam.replace('000000.json', '');
   return new Date(
