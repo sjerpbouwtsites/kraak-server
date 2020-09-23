@@ -1,4 +1,8 @@
-import { KraakWorker } from './kraak-worker';
+import {
+  KraakWorker,
+  KraakBerichtVanWorker,
+  KraakBerichtAanWorker
+} from './kraak-worker';
 
 nodeVersieControle();
 
@@ -8,7 +12,11 @@ async function init() {
     './build/secundair/faillezer.ts'
   );
   rechtbankScraper.berichtAanWorker({ type: 'start' });
-  rechtbankScraper.on('message', () => {});
+  rechtbankScraper.on('message', (bericht: KraakBerichtVanWorker) => {
+    if (bericht.type === 'subtaak-delegatie') {
+      faillissementenLezer.berichtAanWorker(bericht as KraakBerichtAanWorker);
+    }
+  });
 
   // draai varia scrapers
   // try {

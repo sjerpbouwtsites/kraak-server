@@ -59,6 +59,6 @@ export interface KraakBerichtVanWorker {
 }
 
 export interface KraakBerichtAanWorker {
-  type: 'start' | 'stop';
+  type: 'start' | 'stop' | 'subtaak-delegatie';
   data?: any;
 }

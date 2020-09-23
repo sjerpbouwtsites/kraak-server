@@ -89,10 +89,16 @@ async function scrapeData(dagenTeScrapen: string[]) {
         type: 'console',
         data: `scrapede route ${scrapeAns.route}`
       });
+      if (scrapeAns.type === 'gevuld') {
+        parentPort?.postMessage({
+          type: 'taak-delegatie',
+          data: scrapeAns.json
+        });
+      }
       scrapeDag = dagenTeScrapen.shift();
     } while (scrapeDag);
   } catch (error) {
-    console.log(error);
+    console.log(error); // TODO AARRGHHH lege catch
   }
   return true;
 }
@@ -140,7 +146,8 @@ function scrapeDatum(datum: string): Promise<scrapeDatumAns> {
           fs.writeFile(opslagPad, JSON.stringify(jsonBlob), () => {
             scrapeDatumSucces({
               type: 'gevuld',
-              route: route
+              route: route,
+              json: jsonBlob
             });
           });
         }
@@ -154,6 +161,7 @@ function scrapeDatum(datum: string): Promise<scrapeDatumAns> {
 interface scrapeDatumAns {
   type: 'leeg' | 'gevuld';
   route: string;
+  json?: object;
 }
 interface RechtbankJSON {
   Instanties: [];
