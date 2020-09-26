@@ -5,16 +5,15 @@ import {
 } from './kraak-worker';
 
 // gebruikt tijdens dev... om fs te bewerken
-// import { preRunScripts } from './pre-run.js';
-// console.log(typeof preRunScripts, preRunScripts);
-// preRunScripts();
+import { preRunScripts } from './pre-run.js';
+preRunScripts();
 
 nodeVersieControle();
 
 async function init() {
   const rechtbankScraper = new KraakWorker('./build/scrapers/rechtbanken.js');
   const faillissementenLezer = new KraakWorker(
-    './build/secundair/faillezer.ts'
+    './build/secundair/faillezer.js'
   );
   rechtbankScraper.berichtAanWorker({ type: 'start' });
   rechtbankScraper.on('message', (bericht: KraakBerichtVanWorker) => {

@@ -38,6 +38,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     /**
      * TODO BESTANDSBESCHRIJVING
      */
+    const rbScrapeConfig = {
+        consoleOpKlaar: true,
+        consoleOpScrapeBestandSucces: false
+    };
     worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (bericht) => {
         if (bericht.type === 'start') {
             initScraper();
@@ -52,7 +56,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     function initScraper() {
         const dagenTeScrapen = lijstDagenTeScrapen();
         scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {
-            if (scrapeExitBoodschap === true) {
+            if (scrapeExitBoodschap === true && rbScrapeConfig.consoleOpKlaar) {
                 worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
                     type: 'console',
                     data: `ik ben klaar`
@@ -104,13 +108,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         try {
             do {
                 const scrapeAns = await scrapeDatum(scrapeDag);
-                worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                    type: 'console',
-                    data: `scrapede route ${scrapeAns.route}`
-                });
+                if (rbScrapeConfig.consoleOpScrapeBestandSucces) {
+                    worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
+                        type: 'console',
+                        data: `scrapede route ${scrapeAns.route} - was ${scrapeAns.type}`
+                    });
+                }
                 if (scrapeAns.type === 'gevuld') {
                     worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                        type: 'taak-delegatie',
+                        type: 'subtaak-delegatie',
                         data: scrapeAns.json
                     });
                 }

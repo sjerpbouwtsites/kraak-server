@@ -13,7 +13,7 @@ import { config } from './config';
 const verwijderLaatsteVijfRechtbankScrapes = function () {
   const rbpad = `${config.pad.scrapeRes}/rechtbank`;
   const alleRechtbankScrapes = fs.readdirSync(rbpad);
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 3; i++) {
     const teVerwijderen = alleRechtbankScrapes.pop();
     try {
       fs.unlinkSync(`${rbpad}/${teVerwijderen}`);

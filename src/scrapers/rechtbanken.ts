@@ -8,6 +8,11 @@ import { KraakBerichtAanWorker } from '../kraak-worker';
  * TODO BESTANDSBESCHRIJVING
  */
 
+const rbScrapeConfig = {
+  consoleOpKlaar: true,
+  consoleOpScrapeBestandSucces: false
+};
+
 parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
   if (bericht.type === 'start') {
     initScraper();
@@ -23,7 +28,7 @@ parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
 function initScraper() {
   const dagenTeScrapen = lijstDagenTeScrapen();
   scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {
-    if (scrapeExitBoodschap === true) {
+    if (scrapeExitBoodschap === true && rbScrapeConfig.consoleOpKlaar) {
       parentPort?.postMessage({
         type: 'console',
         data: `ik ben klaar`
@@ -85,13 +90,15 @@ async function scrapeData(dagenTeScrapen: string[]) {
   try {
     do {
       const scrapeAns = await scrapeDatum(scrapeDag);
-      parentPort?.postMessage({
-        type: 'console',
-        data: `scrapede route ${scrapeAns.route}`
-      });
+      if (rbScrapeConfig.consoleOpScrapeBestandSucces) {
+        parentPort?.postMessage({
+          type: 'console',
+          data: `scrapede route ${scrapeAns.route} - was ${scrapeAns.type}`
+        });
+      }
       if (scrapeAns.type === 'gevuld') {
         parentPort?.postMessage({
-          type: 'taak-delegatie',
+          type: 'subtaak-delegatie',
           data: scrapeAns.json
         });
       }

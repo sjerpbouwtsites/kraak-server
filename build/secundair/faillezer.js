@@ -16,13 +16,27 @@
      */
     worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (bericht) => {
         if (bericht.type === 'start') {
-            startFailLezer();
+            //
         }
         if (bericht.type === 'stop') {
             process.exit();
         }
+        if (bericht.type === 'subtaak-delegatie') {
+            verwerkFaillissementScrape(bericht.data);
+        }
     });
     function startFailLezer() {
-        //
+        console.log('start fail lezer');
+    }
+    /**
+     * Krijgt via postMessage inhoud van scrape binnen
+     * Verwerkt tot adressen.
+     */
+    function verwerkFaillissementScrape(failScrapeData) {
+        // TODO beter typen
+        worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
+            type: 'console',
+            data: 'kreeg data binnen!'
+        });
     }
 });

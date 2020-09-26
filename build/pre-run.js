@@ -42,7 +42,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     const verwijderLaatsteVijfRechtbankScrapes = function () {
         const rbpad = `${config_1.config.pad.scrapeRes}/rechtbank`;
         const alleRechtbankScrapes = fs.readdirSync(rbpad);
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 3; i++) {
             const teVerwijderen = alleRechtbankScrapes.pop();
             try {
                 fs.unlinkSync(`${rbpad}/${teVerwijderen}`);
