@@ -4,6 +4,11 @@ import {
   KraakBerichtAanWorker
 } from './kraak-worker';
 
+// gebruikt tijdens dev... om fs te bewerken
+// import { preRunScripts } from './pre-run.js';
+// console.log(typeof preRunScripts, preRunScripts);
+// preRunScripts();
+
 nodeVersieControle();
 
 async function init() {
@@ -17,7 +22,6 @@ async function init() {
       faillissementenLezer.berichtAanWorker(bericht as KraakBerichtAanWorker);
     }
   });
-
   // draai varia scrapers
   // try {
   //   const installatie = pakScript("installatie");

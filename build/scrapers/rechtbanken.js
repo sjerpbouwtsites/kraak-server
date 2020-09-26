@@ -35,29 +35,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     const fs = __importStar(require("fs"));
     const config_1 = require("../config");
     const axios_1 = __importDefault(require("axios"));
-    worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (msg) => {
-        if (msg === 'init') {
-            const dagenTeScrapen = lijstDagenTeScrapen();
-            scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {
-                if (scrapeExitBoodschap === true) {
-                    worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                        type: 'console',
-                        data: `ik ben klaar`
-                    });
-                    process.exit();
-                }
-                else {
-                    worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                        type: 'console',
-                        data: `ik heb een onverklaard probleem`
-                    });
-                }
-            });
+    /**
+     * TODO BESTANDSBESCHRIJVING
+     */
+    worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (bericht) => {
+        if (bericht.type === 'start') {
+            initScraper();
         }
-        if (msg === 'exit') {
+        if (bericht.type === 'stop') {
             process.exit();
         }
     });
+    /**
+     * initialisatiefunctie aangeroepen door message eventhandler.
+     */
+    function initScraper() {
+        const dagenTeScrapen = lijstDagenTeScrapen();
+        scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {
+            if (scrapeExitBoodschap === true) {
+                worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
+                    type: 'console',
+                    data: `ik ben klaar`
+                });
+                process.exit();
+            }
+            else {
+                worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
+                    type: 'console',
+                    data: `ik heb een onverklaard probleem`
+                });
+            }
+        });
+    }
     function routeNaarDatum(routeNaam) {
         const d = routeNaam.replace('000000.json', '');
         return new Date(d.substring(0, 4) + '-' + d.substring(4, 6) + '-' + d.substring(6, 8));
@@ -99,11 +108,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                     type: 'console',
                     data: `scrapede route ${scrapeAns.route}`
                 });
+                if (scrapeAns.type === 'gevuld') {
+                    worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
+                        type: 'taak-delegatie',
+                        data: scrapeAns.json
+                    });
+                }
                 scrapeDag = dagenTeScrapen.shift();
             } while (scrapeDag);
         }
         catch (error) {
-            console.log(error);
+            console.log(error); // TODO AARRGHHH lege catch
         }
         return true;
     }
@@ -139,7 +154,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                     fs.writeFile(opslagPad, JSON.stringify(jsonBlob), () => {
                         scrapeDatumSucces({
                             type: 'gevuld',
-                            route: route
+                            route: route,
+                            json: jsonBlob
                         });
                     });
                 }

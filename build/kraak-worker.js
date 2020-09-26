@@ -13,6 +13,8 @@
     const worker_threads_1 = require("worker_threads");
     /**
      * Leeft in de master thread context.
+     * Wrapper voor gedeelde functies van workers zoals console loggen,
+     * status opvragen.
      */
     class KraakWorker extends worker_threads_1.Worker {
         constructor(workerLocatie) {
@@ -21,6 +23,7 @@
             this.workerNaam = null;
             this.zetNaam(workerLocatie);
             this.zetOnMessage();
+            return this;
         }
         /**
          * als worker message naar master thread stuurt.
@@ -37,6 +40,13 @@
         zetNaam(workerLocatie) {
             const wl = workerLocatie.split('/');
             this.workerNaam = wl[wl.length - 1].replace('.js', '');
+        }
+        /**
+         * wrapper om type KraakWorkerBericht te verplichten
+         * @param bericht KraakWorkerBericht type
+         */
+        berichtAanWorker(bericht) {
+            this.postMessage(bericht);
         }
     }
     exports.KraakWorker = KraakWorker;

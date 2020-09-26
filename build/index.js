@@ -10,10 +10,20 @@
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const kraak_worker_1 = require("./kraak-worker");
+    // gebruikt tijdens dev... om fs te bewerken
+    // import { preRunScripts } from './pre-run.js';
+    // console.log(typeof preRunScripts, preRunScripts);
+    // preRunScripts();
     nodeVersieControle();
     async function init() {
         const rechtbankScraper = new kraak_worker_1.KraakWorker('./build/scrapers/rechtbanken.js');
-        rechtbankScraper.postMessage('init');
+        const faillissementenLezer = new kraak_worker_1.KraakWorker('./build/secundair/faillezer.ts');
+        rechtbankScraper.berichtAanWorker({ type: 'start' });
+        rechtbankScraper.on('message', (bericht) => {
+            if (bericht.type === 'subtaak-delegatie') {
+                faillissementenLezer.berichtAanWorker(bericht);
+            }
+        });
         // draai varia scrapers
         // try {
         //   const installatie = pakScript("installatie");
