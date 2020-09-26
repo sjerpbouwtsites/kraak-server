@@ -40,7 +40,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
      */
     const rbScrapeConfig = {
         consoleOpKlaar: true,
-        consoleOpScrapeBestandSucces: false
+        consoleOpScrapeBestandSucces: true
     };
     worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (bericht) => {
         if (bericht.type === 'start') {
@@ -171,6 +171,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                 scrapeDatumFaal(err);
             });
         });
+    }
+    class Publicatieclusters extends Array {
     }
     /**
      *

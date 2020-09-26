@@ -10,7 +10,7 @@ import { KraakBerichtAanWorker } from '../kraak-worker';
 
 const rbScrapeConfig = {
   consoleOpKlaar: true,
-  consoleOpScrapeBestandSucces: false
+  consoleOpScrapeBestandSucces: true
 };
 
 parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
@@ -171,17 +171,21 @@ interface scrapeDatumAns {
   json?: object;
 }
 export interface RechtbankJSON {
-  Instanties: Intantie[];
+  Instanties: Instantie[];
   Datum: string;
 }
 
-interface Intantie {
+interface Instantie {
   PublicerendeInstantieOmschrijving: string;
   Locaties: object[];
-  Publicatieclusters: Publicatiecluster[];
+  Publicatieclusters: Publicatieclusters;
 }
 
-interface Publicatiecluster {
+class Publicatieclusters extends Array {
+  [index: number]: Publicatiecluster;
+}
+
+export interface Publicatiecluster {
   PublicatieclusterOmschrijving: publicatieClusterOmschrijving;
   Publicatiesoorten: [
     {
@@ -194,24 +198,24 @@ interface Publicatiecluster {
   ];
 }
 
-type publicatieClusterOmschrijving =
+export type publicatieClusterOmschrijving =
   | 'einde faillissementen'
-  | 'uitspraken  | faillissement'
-  | 'vereenvoudigde afwikkeling faillissementen'
-  | 'surseances'
-  | 'faillissementen'
-  | 'neerlegging tussentijdse uitdelingslijst in faillissementen'
-  | 'neerlegging slotuitdelingslijst in faillissementen'
-  | 'rectificatie'
-  | 'uitspraken schuldsanering'
-  | 'zittingen in schuldsaneringen'
   | 'einde schuldsaneringen'
-  | 'neerlegging slotuitdelingslijst in schuldsaneringen'
-  | 'vervanging cur / bwv'
   | 'einde surseances'
-  | 'uitspraken surseance'
+  | 'faillissementen'
+  | 'neerlegging slotuitdelingslijst in faillissementen'
+  | 'neerlegging slotuitdelingslijst in schuldsaneringen'
+  | 'neerlegging tussentijdse uitdelingslijst in faillissementen'
+  | 'rectificatie'
   | 'schuldsaneringen'
-  | 'zittingen in faillissementen';
+  | 'surseances'
+  | 'uitspraken  | faillissement'
+  | 'uitspraken schuldsanering'
+  | 'uitspraken surseance'
+  | 'vereenvoudigde afwikkeling faillissementen'
+  | 'vervanging cur / bwv'
+  | 'zittingen in faillissementen'
+  | 'zittingen in schuldsaneringen';
 
 /**
  *

@@ -4,15 +4,15 @@
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "./kraak-worker", "./pre-run.js"], factory);
+        define(["require", "exports", "./kraak-worker"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const kraak_worker_1 = require("./kraak-worker");
     // gebruikt tijdens dev... om fs te bewerken
-    const pre_run_js_1 = require("./pre-run.js");
-    pre_run_js_1.preRunScripts();
+    // import { preRunScripts } from './pre-run.js';
+    // preRunScripts();
     nodeVersieControle();
     async function init() {
         const rechtbankScraper = new kraak_worker_1.KraakWorker('./build/scrapers/rechtbanken.js');

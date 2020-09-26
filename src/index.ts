@@ -5,8 +5,8 @@ import {
 } from './kraak-worker';
 
 // gebruikt tijdens dev... om fs te bewerken
-import { preRunScripts } from './pre-run.js';
-preRunScripts();
+// import { preRunScripts } from './pre-run.js';
+// preRunScripts();
 
 nodeVersieControle();
 
