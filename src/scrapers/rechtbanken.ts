@@ -170,9 +170,48 @@ interface scrapeDatumAns {
   route: string;
   json?: object;
 }
-interface RechtbankJSON {
-  Instanties: [];
+export interface RechtbankJSON {
+  Instanties: Intantie[];
+  Datum: string;
 }
+
+interface Intantie {
+  PublicerendeInstantieOmschrijving: string;
+  Locaties: object[];
+  Publicatieclusters: Publicatiecluster[];
+}
+
+interface Publicatiecluster {
+  PublicatieclusterOmschrijving: publicatieClusterOmschrijving;
+  Publicatiesoorten: [
+    {
+      PublicatiesNaarLocatie: [
+        {
+          Publicaties: string[];
+        }
+      ];
+    }
+  ];
+}
+
+type publicatieClusterOmschrijving =
+  | 'einde faillissementen'
+  | 'uitspraken  | faillissement'
+  | 'vereenvoudigde afwikkeling faillissementen'
+  | 'surseances'
+  | 'faillissementen'
+  | 'neerlegging tussentijdse uitdelingslijst in faillissementen'
+  | 'neerlegging slotuitdelingslijst in faillissementen'
+  | 'rectificatie'
+  | 'uitspraken schuldsanering'
+  | 'zittingen in schuldsaneringen'
+  | 'einde schuldsaneringen'
+  | 'neerlegging slotuitdelingslijst in schuldsaneringen'
+  | 'vervanging cur / bwv'
+  | 'einde surseances'
+  | 'uitspraken surseance'
+  | 'schuldsaneringen'
+  | 'zittingen in faillissementen';
 
 /**
  *
