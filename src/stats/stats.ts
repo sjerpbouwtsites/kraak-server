@@ -117,6 +117,43 @@ parentPort?.on('message', (bericht: any) => {
 });
 
 async function schrijfHTML() {
+  const jsReload = `
+    const rt = 1000
+     
+    setTimeout(()=>{
+      location.reload()
+    }, rt)
+  `;
+
+  const jsAfsluiten = `
+    const rt = 5000;
+    let afsluitenGaatDoor = true;
+     
+    const na = document.getElementById('nietAfsluiten');
+    const ahtml = document.getElementById('afsluit-html');
+    na.addEventListener('click', ()=>{
+        afsluitenGaatDoor = false;
+        ahtml.parentNode.removeChild(ahtml)  
+      })
+    setTimeout(()=>{
+      if (afsluitenGaatDoor) {
+        close();
+      }
+    }, rt)
+  `;
+
+  const htmlReload = '';
+  const htmlAfsluiten = `
+    <div id='afsluit-html' class='afsluit-html'>
+      <h1>Deze pagina wordt afgesloten.</h1>
+      <p>Programma is klaar</p>
+      <button id='nietAfsluiten'>Niet afsluiten</button>
+    </div>
+  `;
+
+  const jsBlob = consData.streaming ? jsReload : jsAfsluiten;
+  const htmlBlob = consData.streaming ? htmlReload : htmlAfsluiten;
+
   fs.writeFileSync(
     __dirname + '/../../public/index.html',
     `
@@ -124,22 +161,41 @@ async function schrijfHTML() {
   <body>
     <head>
       <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css'>
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"> 
       <style>
-        
+        * {
+          font-family: 'Roboto', sans-serif;
+        }
         th, td {
           padding: 10px;
           text-align: center;
         }
+        th {
+          background-color: black;
+          color: white;
+          font-variant: small-caps
+        }
+        td {
+          background-color: white;
+        }
+        body {
+          background-color: #f2f2f2;
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+          min-height: 100vh;
+        }
+
       </style>
-      ${
-        consData.streaming
-          ? `<script>setTimeout(()=>{location.reload()}, 2500)`
-          : `<script>window.close()</script>`
-      }</script>
     </head>
     <html>
-    
-      ${consData.print()}
+        <div class='kraak-stats'>
+          ${htmlBlob}
+          ${consData.print()}
+        </div>
+      <script>
+        ${jsBlob}
+       </script>      
 </html>
   </body>
   `

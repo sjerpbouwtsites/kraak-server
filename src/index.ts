@@ -3,59 +3,20 @@ import {
   KraakBerichtVanWorker,
   KraakBerichtAanWorker
 } from './kraak-worker';
-import { Worker } from 'worker_threads';
-import fs from 'fs';
-import http from 'http';
 
-http
-  .createServer(function (req, res) {
-    const indexHTML = fs.readFileSync(__dirname + '/../public/index.html');
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.write(indexHTML); //write a response to the client
-    res.end(); //end the response
-  })
-  .listen(8080); //the server object listens on port 8080
+import procesNuts from './nuts/proces';
+import nuts from './nuts/generiek';
 
+/**
+ * node http server die public/index.html serft.
+ */
+import startStatsServer from './stats/indexServer';
+
+startStatsServer();
 const statsWorker = new KraakWorker('./build/stats/stats.js');
 statsWorker.berichtAanWorker({
   type: 'start'
 });
-
-statsWorker.berichtAanWorker({
-  type: 'debug',
-  data: {
-    naam: 'harry',
-    data: {
-      nee: 10,
-      ja: 325
-    }
-  }
-});
-
-statsWorker.berichtAanWorker({
-  type: 'debug',
-  data: {
-    naam: 'harry',
-    data: {
-      doei: 'ofdgf'
-    }
-  }
-});
-
-setTimeout(() => {
-  statsWorker.berichtAanWorker({
-    type: 'stop'
-  });
-  statsWorker.on('message', function (bericht: KraakBerichtVanWorker) {
-    if (bericht.type === 'status') {
-      if (bericht.data === 'dood') {
-        process.exit();
-      } else {
-        throw new Error('statsworker wilt niet dood??' + bericht.data);
-      }
-    }
-  });
-}, 10000);
 
 // gebruikt tijdens dev... om fs te bewerken
 // import { preRunScripts } from './pre-run.js';
@@ -111,6 +72,10 @@ async function init() {
 }
 
 init();
+
+nuts.time(5000).then(() => {
+  procesNuts.stop(statsWorker);
+});
 
 /**
  * Als lager dan versie 13, niet draaien.

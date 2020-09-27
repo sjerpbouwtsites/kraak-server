@@ -7,60 +7,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "./kraak-worker", "fs", "http"], factory);
+        define(["require", "exports", "./kraak-worker", "./nuts/proces", "./nuts/generiek", "./stats/indexServer"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const kraak_worker_1 = require("./kraak-worker");
-    const fs_1 = __importDefault(require("fs"));
-    const http_1 = __importDefault(require("http"));
-    http_1.default
-        .createServer(function (req, res) {
-        const indexHTML = fs_1.default.readFileSync(__dirname + '/../public/index.html');
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.write(indexHTML); //write a response to the client
-        res.end(); //end the response
-    })
-        .listen(8080); //the server object listens on port 8080
+    const proces_1 = __importDefault(require("./nuts/proces"));
+    const generiek_1 = __importDefault(require("./nuts/generiek"));
+    /**
+     * node http server die public/index.html serft.
+     */
+    const indexServer_1 = __importDefault(require("./stats/indexServer"));
+    indexServer_1.default();
     const statsWorker = new kraak_worker_1.KraakWorker('./build/stats/stats.js');
     statsWorker.berichtAanWorker({
         type: 'start'
     });
-    statsWorker.berichtAanWorker({
-        type: 'debug',
-        data: {
-            naam: 'harry',
-            data: {
-                nee: 10,
-                ja: 325
-            }
-        }
-    });
-    statsWorker.berichtAanWorker({
-        type: 'debug',
-        data: {
-            naam: 'harry',
-            data: {
-                doei: 'ofdgf'
-            }
-        }
-    });
-    setTimeout(() => {
-        statsWorker.berichtAanWorker({
-            type: 'stop'
-        });
-        statsWorker.on('message', function (bericht) {
-            if (bericht.type === 'status') {
-                if (bericht.data === 'dood') {
-                    process.exit();
-                }
-                else {
-                    throw new Error('statsworker wilt niet dood??' + bericht.data);
-                }
-            }
-        });
-    }, 10000);
     // gebruikt tijdens dev... om fs te bewerken
     // import { preRunScripts } from './pre-run.js';
     // preRunScripts();
@@ -111,6 +74,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         // }
     }
     init();
+    generiek_1.default.time(5000).then(() => {
+        proces_1.default.stop(statsWorker);
+    });
     /**
      * Als lager dan versie 13, niet draaien.
      */
