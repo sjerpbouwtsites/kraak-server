@@ -3,24 +3,80 @@ import {
   KraakBerichtVanWorker,
   KraakBerichtAanWorker
 } from './kraak-worker';
+import { Worker } from 'worker_threads';
+import fs from 'fs';
+import http from 'http';
+
+http
+  .createServer(function (req, res) {
+    const indexHTML = fs.readFileSync(__dirname + '/../public/index.html');
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.write(indexHTML); //write a response to the client
+    res.end(); //end the response
+  })
+  .listen(8080); //the server object listens on port 8080
+
+const statsWorker = new KraakWorker('./build/stats/stats.js');
+statsWorker.berichtAanWorker({
+  type: 'start'
+});
+
+statsWorker.berichtAanWorker({
+  type: 'debug',
+  data: {
+    naam: 'harry',
+    data: {
+      nee: 10,
+      ja: 325
+    }
+  }
+});
+
+statsWorker.berichtAanWorker({
+  type: 'debug',
+  data: {
+    naam: 'harry',
+    data: {
+      doei: 'ofdgf'
+    }
+  }
+});
+
+setTimeout(() => {
+  statsWorker.berichtAanWorker({
+    type: 'stop'
+  });
+  statsWorker.on('message', function (bericht: KraakBerichtVanWorker) {
+    if (bericht.type === 'status') {
+      if (bericht.data === 'dood') {
+        process.exit();
+      } else {
+        throw new Error('statsworker wilt niet dood??' + bericht.data);
+      }
+    }
+  });
+}, 10000);
 
 // gebruikt tijdens dev... om fs te bewerken
 // import { preRunScripts } from './pre-run.js';
 // preRunScripts();
 
+// const url = 'http://localhost:8080';
+// const connection = new WebSocket(url);
+
 nodeVersieControle();
 
 async function init() {
-  const rechtbankScraper = new KraakWorker('./build/scrapers/rechtbanken.js');
-  const faillissementenLezer = new KraakWorker(
-    './build/secundair/faillezer.js'
-  );
-  rechtbankScraper.berichtAanWorker({ type: 'start' });
-  rechtbankScraper.on('message', (bericht: KraakBerichtVanWorker) => {
-    if (bericht.type === 'subtaak-delegatie') {
-      faillissementenLezer.berichtAanWorker(bericht as KraakBerichtAanWorker);
-    }
-  });
+  // const rechtbankScraper = new KraakWorker('./build/scrapers/rechtbanken.js');
+  // const faillissementenLezer = new KraakWorker(
+  //   './build/secundair/faillezer.js'
+  // );
+  // rechtbankScraper.berichtAanWorker({ type: 'start' });
+  // rechtbankScraper.on('message', (bericht: KraakBerichtVanWorker) => {
+  //   if (bericht.type === 'subtaak-delegatie') {
+  //     faillissementenLezer.berichtAanWorker(bericht as KraakBerichtAanWorker);
+  //   }
+  // });
   // draai varia scrapers
   // try {
   //   const installatie = pakScript("installatie");

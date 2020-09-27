@@ -17,11 +17,24 @@ export class KraakWorker extends Worker {
     this.zetOnMessage();
     return this;
   }
+  objectNaarTekst(object: any) {
+    const r: string[] = [];
+    for (let a in object) {
+      r.push(`${a}:  - ${object[a]}`);
+    }
+    return r.join('\n');
+  }
   /**
    * als worker message naar master thread stuurt.
    */
   zetOnMessage() {
     this.on('message', (bericht: KraakBerichtVanWorker) => {
+      if (bericht.type === 'console-lijst') {
+        console.log(`
+        ${this.workerNaam} worker
+        ${this.objectNaarTekst(bericht.data)}`);
+      }
+
       if (bericht.type === 'console') {
         console.log(`
         ${this.workerNaam} worker
@@ -55,10 +68,10 @@ export class KraakWorker extends Worker {
 export interface KraakBerichtVanWorker {
   workerNaam?: string | null;
   data?: any;
-  type: 'console' | 'subtaak-delegatie';
+  type: 'console' | 'console-lijst' | 'subtaak-delegatie' | 'status';
 }
 
 export interface KraakBerichtAanWorker {
-  type: 'start' | 'stop' | 'subtaak-delegatie';
+  type: 'start' | 'stop' | 'subtaak-delegatie' | 'debug';
   data?: any;
 }
