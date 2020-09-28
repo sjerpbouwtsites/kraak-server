@@ -39,12 +39,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     proces_1.default.nodeVersieControle();
     async function init() {
         const rechtbankScraper = new kraak_worker_1.KraakWorker('./build/scrapers/rechtbanken.js');
+        rechtbankScraper.koppelStatsWorker(statsWorker);
         const faillissementenLezer = new kraak_worker_1.KraakWorker('./build/secundair/faillezer.js');
         rechtbankScraper.berichtAanWorker({ type: 'start' });
         rechtbankScraper.on('message', (bericht) => {
             if (bericht.type === 'subtaak-delegatie') {
                 faillissementenLezer.berichtAanWorker(bericht);
             }
+        });
+        generiek_1.default.time(5000).then(() => {
+            // TODO als de scrapers stil zijn e.d. ??
+            // procesNuts.stop(statsWorker);
         });
         // draai varia scrapers
         // try {
@@ -79,7 +84,4 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         // }
     }
     init();
-    generiek_1.default.time(5000).then(() => {
-        proces_1.default.stop(statsWorker);
-    });
 });

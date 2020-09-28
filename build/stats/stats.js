@@ -35,13 +35,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
              * TODO naam worker is onterecht, kan ook wat anders zijn.
              */
             this.workers = [
-                {
-                    naam: 'test',
-                    data: {
-                        ja: true
-                    }
-                }
+            // {
+            //   naam: 'test',
+            //   data: {
+            //     ja: true
+            //   }
+            // }
             ];
+            /**
+             * lijst met te verwerken logs.
+             */
+            this.logWerkLijst = [];
+        }
+        voegToeAanLogTakenLijst(nieuweDebug) {
+            this.logWerkLijst.push({
+                naam: nieuweDebug.naam,
+                log: nieuweDebug.log
+            });
+        }
+        get logLiHTML() {
+            return this.logWerkLijst
+                .map((logStuk) => {
+                return `<li class='log-stuk'>${logStuk.log.padEnd(35)} ${logStuk.naam}</li>`;
+            })
+                .join('');
         }
         /**
          * Indien debugobject bestaat in this.workers, vernieuw en of vul aan. Zo nee, maak aan. Schrijf HTML.
@@ -51,10 +68,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         voegToeAanWorkers(nieuweDebug) {
             const index = this.workers.findIndex((worker) => worker.naam === nieuweDebug.naam);
             if (index !== -1) {
-                this.workers[index].data = Object.assign(this.workers[index].data, nieuweDebug.data);
+                this.workers[index].data = Object.assign(this.workers[index].data, nieuweDebug.tabel);
             }
             else {
-                this.workers.push(nieuweDebug);
+                this.workers.push({
+                    naam: nieuweDebug.naam,
+                    data: nieuweDebug.tabel
+                });
             }
             schrijfHTML();
         }
@@ -100,9 +120,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     }
     const consData = new ConsoleData();
     worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (bericht) => {
+        var _a, _b;
         switch (bericht.type) {
             case 'subtaak-delegatie':
-                consData.voegToeAanWorkers(bericht.data);
+                if (bericht.data.log) {
+                    consData.voegToeAanLogTakenLijst({
+                        naam: (_a = bericht.data) === null || _a === void 0 ? void 0 : _a.naam,
+                        log: (_b = bericht.data) === null || _b === void 0 ? void 0 : _b.log
+                    });
+                }
+                if (bericht.data.tabel) {
+                    consData.voegToeAanWorkers(bericht.data);
+                }
                 break;
             case 'start':
                 startStatWorker();
@@ -223,6 +252,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
       </style>
     </head>
     <html>
+    ${JSON.stringify(consData.workers)}<br>
+    ${JSON.stringify(consData.logWerkLijst)}<br>
+    <ul class='kraak-log'>
+      ${consData.logLiHTML}
+    </ul>
         <div class='kraak-stats'>
           ${htmlBlob}
           ${consData.workerDataTabel}

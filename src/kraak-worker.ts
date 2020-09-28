@@ -12,6 +12,11 @@ export class KraakWorker extends Worker {
   public workerLocatie: string | null = null;
   public workerNaam: string | null = null;
 
+  /**
+   * referentie naar statsWorker Worker class instance
+   */
+  public statsWorker?: KraakWorker;
+
   constructor(workerLocatie: string) {
     super(workerLocatie);
 
@@ -21,20 +26,37 @@ export class KraakWorker extends Worker {
     return this;
   }
 
+  koppelStatsWorker(statsWorker: KraakWorker) {
+    this.statsWorker = statsWorker;
+  }
+
   /**
    * als worker message naar master thread stuurt.
    */
   zetOnMessage(): KraakWorker {
     this.on('message', (bericht: KraakBerichtVanWorker) => {
-      if (bericht.type === 'console-lijst') {
-        console.log(`
-        ${this.workerNaam} worker
-        ${nuts.objectNaarTekst(bericht.data)}`);
-      }
-
       if (bericht.type === 'console') {
+        // TODO legacy?
         console.log(`${bericht.data} ${this.workerNaam?.padStart(25)} 
         `);
+      }
+
+      if (bericht.type === 'status') {
+        if (!this.statsWorker) {
+          throw new Error(`KOPPEL EERST DE STATWORKER AAN ${this.workerNaam}`);
+          return;
+        }
+
+        const debugBericht: KraakDebugBericht = {
+          type: 'subtaak-delegatie',
+          data: {
+            log: bericht?.data?.log,
+            naam: this.workerNaam || 'onbekend',
+            tabel: bericht.data.tabel
+          }
+        };
+
+        this.statsWorker?.berichtAanWorker(debugBericht);
       }
     });
     return this;

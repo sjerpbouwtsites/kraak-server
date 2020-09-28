@@ -36,23 +36,22 @@ body {
       </style>
     </head>
     <html>
+    [{"naam":"rechtbanken","data":{"rbStatus":"klaar"}}]<br>
+    [{"naam":"rechtbanken","log":"HE STATSWORKER! ik ben begonnen."},{"naam":"rechtbanken","log":"scrapede route 20200926000000 - was leeg"},{"naam":"rechtbanken","log":"scrapede route 20200927000000 - was leeg"},{"naam":"rechtbanken","log":"Rechtbanken scraper klaar."}]<br>
+    <ul class='kraak-log'>
+      <li class='log-stuk'>HE STATSWORKER! ik ben begonnen.    rechtbanken</li><li class='log-stuk'>scrapede route 20200926000000 - was leeg rechtbanken</li><li class='log-stuk'>scrapede route 20200927000000 - was leeg rechtbanken</li><li class='log-stuk'>Rechtbanken scraper klaar.          rechtbanken</li>
+    </ul>
         <div class='kraak-stats'>
           
-    <div id='afsluit-html' class='afsluit-html'>
-      <h1>Deze pagina wordt afgesloten.</h1>
-      <p>Programma is klaar</p>
-      <button id='nietAfsluiten'>Niet afsluiten</button>
-    </div>
-  
           
       <table>
         
       <thead>
-        <th>test</th>
+        <th>rechtbanken</th>
       </thead>
         <tr>
         <td>
-          ja:  true
+          rbStatus:  klaar
         </td>
           </tr>
       </table>
@@ -60,19 +59,10 @@ body {
         </div>
       <script>
         
-    const rt = 5000;
-    let afsluitenGaatDoor = true;
+    const rt = 1000
      
-    const na = document.getElementById('nietAfsluiten');
-    const ahtml = document.getElementById('afsluit-html');
-    na.addEventListener('click', ()=>{
-        afsluitenGaatDoor = false;
-        ahtml.parentNode.removeChild(ahtml)  
-      })
     setTimeout(()=>{
-      if (afsluitenGaatDoor) {
-        close();
-      }
+      location.reload()
     }, rt)
   
        </script>      

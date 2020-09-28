@@ -20,6 +20,13 @@ const rbScrapeConfig = {
 
 parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
   if (bericht.type === 'start') {
+    parentPort?.postMessage({
+      type: 'status',
+      data: {
+        log: `HE STATSWORKER! ik ben begonnen.`
+      }
+    });
+
     initScraper();
   }
   if (bericht.type === 'stop') {
@@ -36,15 +43,27 @@ function initScraper() {
     if (scrapeExitBoodschap === true && rbScrapeConfig.consoleOpKlaar) {
       // TODO naar statworker
       parentPort?.postMessage({
-        type: 'console',
-        data: `ik ben klaar`
+        type: 'status',
+        data: {
+          log: `Rechtbanken scraper klaar.`
+        }
+      });
+      parentPort?.postMessage({
+        type: 'status',
+        data: {
+          tabel: {
+            rbStatus: 'klaar'
+          }
+        }
       });
       process.exit();
     } else {
       // TODO naar statworker
       parentPort?.postMessage({
-        type: 'console',
-        data: `ik heb een onverklaard probleem`
+        type: 'status',
+        data: {
+          log: `Problemen bij de Rechtbanken scraper.`
+        }
       });
     }
   });
@@ -93,8 +112,10 @@ async function scrapeData(dagenTeScrapen: string[]) {
       const scrapeAns = await scrapeDatum(scrapeDag);
       if (rbScrapeConfig.consoleOpScrapeBestandSucces) {
         parentPort?.postMessage({
-          type: 'console',
-          data: `scrapede route ${scrapeAns.route} - was ${scrapeAns.type}`
+          type: 'status',
+          data: {
+            log: `scrapede route ${scrapeAns.route} - was ${scrapeAns.type}`
+          }
         });
       }
       if (scrapeAns.type === 'gevuld') {

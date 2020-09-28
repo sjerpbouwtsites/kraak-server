@@ -24,13 +24,35 @@ class ConsoleData {
    * TODO naam worker is onterecht, kan ook wat anders zijn.
    */
   public workers: workersO[] = [
-    {
-      naam: 'test',
-      data: {
-        ja: true
-      }
-    }
+    // {
+    //   naam: 'test',
+    //   data: {
+    //     ja: true
+    //   }
+    // }
   ];
+
+  /**
+   * lijst met te verwerken logs.
+   */
+  public logWerkLijst: { naam: string; log: string }[] = [];
+
+  voegToeAanLogTakenLijst(nieuweDebug: any) {
+    this.logWerkLijst.push({
+      naam: nieuweDebug.naam,
+      log: nieuweDebug.log
+    });
+  }
+
+  get logLiHTML(): string {
+    return this.logWerkLijst
+      .map((logStuk) => {
+        return `<li class='log-stuk'>${logStuk.log.padEnd(35)} ${
+          logStuk.naam
+        }</li>`;
+      })
+      .join('');
+  }
 
   /**
    * Indien debugobject bestaat in this.workers, vernieuw en of vul aan. Zo nee, maak aan. Schrijf HTML.
@@ -44,10 +66,13 @@ class ConsoleData {
     if (index !== -1) {
       this.workers[index].data = Object.assign(
         this.workers[index].data,
-        nieuweDebug.data
+        nieuweDebug.tabel
       );
     } else {
-      this.workers.push(nieuweDebug);
+      this.workers.push({
+        naam: nieuweDebug.naam,
+        data: nieuweDebug.tabel
+      });
     }
     schrijfHTML();
   }
@@ -102,7 +127,15 @@ parentPort?.on(
   (bericht: KraakDebugBericht | KraakBerichtAanWorker) => {
     switch (bericht.type) {
       case 'subtaak-delegatie':
-        consData.voegToeAanWorkers(bericht.data as workersO);
+        if (bericht.data.log) {
+          consData.voegToeAanLogTakenLijst({
+            naam: bericht.data?.naam,
+            log: bericht.data?.log
+          });
+        }
+        if (bericht.data.tabel) {
+          consData.voegToeAanWorkers(bericht.data as workersO);
+        }
         break;
       case 'start':
         startStatWorker();
@@ -233,6 +266,9 @@ async function schrijfHTML() {
       </style>
     </head>
     <html>
+    <ul class='kraak-log'>
+      ${consData.logLiHTML}
+    </ul>
         <div class='kraak-stats'>
           ${htmlBlob}
           ${consData.workerDataTabel}

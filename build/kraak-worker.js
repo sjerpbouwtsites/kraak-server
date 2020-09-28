@@ -1,20 +1,16 @@
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 (function (factory) {
     if (typeof module === "object" && typeof module.exports === "object") {
         var v = factory(require, exports);
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "worker_threads", "./nuts/generiek"], factory);
+        define(["require", "exports", "worker_threads"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.KraakWorker = void 0;
     const worker_threads_1 = require("worker_threads");
-    const generiek_1 = __importDefault(require("./nuts/generiek"));
     /**
      * Leeft in de master thread context.
      * Is een REFERENTIE aan de worker, niet de worker zelf.
@@ -32,20 +28,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
             this.zetOnMessage();
             return this;
         }
+        koppelStatsWorker(statsWorker) {
+            this.statsWorker = statsWorker;
+        }
         /**
          * als worker message naar master thread stuurt.
          */
         zetOnMessage() {
             this.on('message', (bericht) => {
-                var _a;
-                if (bericht.type === 'console-lijst') {
-                    console.log(`
-        ${this.workerNaam} worker
-        ${generiek_1.default.objectNaarTekst(bericht.data)}`);
-                }
+                var _a, _b, _c;
                 if (bericht.type === 'console') {
+                    // TODO legacy?
                     console.log(`${bericht.data} ${(_a = this.workerNaam) === null || _a === void 0 ? void 0 : _a.padStart(25)} 
         `);
+                }
+                if (bericht.type === 'status') {
+                    if (!this.statsWorker) {
+                        throw new Error(`KOPPEL EERST DE STATWORKER AAN ${this.workerNaam}`);
+                        return;
+                    }
+                    const debugBericht = {
+                        type: 'subtaak-delegatie',
+                        data: {
+                            log: (_b = bericht === null || bericht === void 0 ? void 0 : bericht.data) === null || _b === void 0 ? void 0 : _b.log,
+                            naam: this.workerNaam || 'onbekend',
+                            tabel: bericht.data.tabel
+                        }
+                    };
+                    (_c = this.statsWorker) === null || _c === void 0 ? void 0 : _c.berichtAanWorker(debugBericht);
                 }
             });
             return this;

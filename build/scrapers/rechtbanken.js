@@ -48,6 +48,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     };
     worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (bericht) => {
         if (bericht.type === 'start') {
+            worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
+                type: 'status',
+                data: {
+                    log: `HE STATSWORKER! ik ben begonnen.`
+                }
+            });
             initScraper();
         }
         if (bericht.type === 'stop') {
@@ -63,16 +69,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
             if (scrapeExitBoodschap === true && rbScrapeConfig.consoleOpKlaar) {
                 // TODO naar statworker
                 worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                    type: 'console',
-                    data: `ik ben klaar`
+                    type: 'status',
+                    data: {
+                        log: `Rechtbanken scraper klaar.`
+                    }
+                });
+                worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
+                    type: 'status',
+                    data: {
+                        tabel: {
+                            rbStatus: 'klaar'
+                        }
+                    }
                 });
                 process.exit();
             }
             else {
                 // TODO naar statworker
                 worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                    type: 'console',
-                    data: `ik heb een onverklaard probleem`
+                    type: 'status',
+                    data: {
+                        log: `Problemen bij de Rechtbanken scraper.`
+                    }
                 });
             }
         });
@@ -112,8 +130,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                 const scrapeAns = await scrapeDatum(scrapeDag);
                 if (rbScrapeConfig.consoleOpScrapeBestandSucces) {
                     worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                        type: 'console',
-                        data: `scrapede route ${scrapeAns.route} - was ${scrapeAns.type}`
+                        type: 'status',
+                        data: {
+                            log: `scrapede route ${scrapeAns.route} - was ${scrapeAns.type}`
+                        }
                     });
                 }
                 if (scrapeAns.type === 'gevuld') {

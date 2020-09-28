@@ -33,6 +33,7 @@ procesNuts.nodeVersieControle();
 
 async function init() {
   const rechtbankScraper = new KraakWorker('./build/scrapers/rechtbanken.js');
+  rechtbankScraper.koppelStatsWorker(statsWorker);
   const faillissementenLezer = new KraakWorker(
     './build/secundair/faillezer.js'
   );
@@ -45,7 +46,7 @@ async function init() {
 
   nuts.time(5000).then(() => {
     // TODO als de scrapers stil zijn e.d. ??
-    procesNuts.stop(statsWorker);
+    // procesNuts.stop(statsWorker);
   });
 
   // draai varia scrapers
