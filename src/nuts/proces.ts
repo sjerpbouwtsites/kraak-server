@@ -1,6 +1,15 @@
+/**
+ * @file Die nutsfuncties die betrekking hebben op het proces
+ * cq het node process, of het leven van de controller index.ts
+ */
+
 import { KraakBerichtVanWorker, KraakWorker } from '../kraak-worker';
 
 export default {
+  /**
+   * Stop het gehele node process (in index.ts) zodra aanpalende apps & werkers ook beeindigd zijn
+   * @param statsWorker verwijzing naar statistieken / console verwerkende worker
+   */
   stop(statsWorker: KraakWorker) {
     statsWorker.berichtAanWorker({
       type: 'stop'

@@ -3,27 +3,31 @@ import {
   KraakBerichtVanWorker,
   KraakBerichtAanWorker
 } from './kraak-worker';
-
 import procesNuts from './nuts/proces';
 import nuts from './nuts/generiek';
-
-/**
- * node http server die public/index.html serft.
- */
 import startStatsServer from './stats/indexServer';
+import preRunScripts from './pre-run.js';
+// TODO wrapper maken van parentPort die het koppelt aan de controller om zo de berichten te kunnen typen
 
+// start http server met statWorker resultaat.
 startStatsServer();
-const statsWorker = new KraakWorker('./build/stats/stats.js');
-statsWorker.berichtAanWorker({
+
+const statsWorker = new KraakWorker('./build/stats/stats.js').berichtAanWorker({
   type: 'start'
 });
 
 // gebruikt tijdens dev... om fs te bewerken
-// import { preRunScripts } from './pre-run.js';
-// preRunScripts();
-
-// const url = 'http://localhost:8080';
-// const connection = new WebSocket(url);
+try {
+  preRunScripts();
+} catch (err) {
+  statsWorker.berichtAanWorker({
+    type: 'subtaak-delegatie',
+    data: {
+      naam: 'pre-run',
+      tabel: err
+    }
+  });
+}
 
 nodeVersieControle();
 

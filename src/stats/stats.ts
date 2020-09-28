@@ -1,18 +1,28 @@
-import { parentPort, Worker } from 'worker_threads';
+/**
+ * @file Worker. Houdt bij, per oorsprong, wat voor data actueel is gelogd. Schrijft naar public/index.html de 'luxe console'. Zijn kaartjes met data.
+ * TOEKOMST TODO 'console-rol' soort ticker maken en scheiden van 'data overzicht'.
+ * TODO: naar secundaire workers. (??)
+ */
 
+import { parentPort } from 'worker_threads';
 import fs from 'fs';
 import open from 'open';
+import { KraakDebugBericht, KraakBerichtAanWorker } from '../kraak-worker';
 
 /**
- * FUCKING SHIT voel me naar maar wilde dit ff bouwen
+ * Waarom is dit een worker? Ik had ruzie met typescript en had er ff geen zin in 😫 TODO class onzin weghalen.
  */
 class ConsoleData {
-  construct() {
-    console.log('hoera');
-  }
-
+  /**
+   * Of de console-pagina index.html geopend moet zijn en ververst moet worden
+   * of afgesloten.
+   */
   public streaming: boolean = true;
 
+  /**
+   * Dragers van de te debuggen / tabelleren data.
+   * TODO naam worker is onterecht, kan ook wat anders zijn.
+   */
   public workers: workersO[] = [
     {
       naam: 'test',
@@ -22,6 +32,11 @@ class ConsoleData {
     }
   ];
 
+  /**
+   * Indien debugobject bestaat in this.workers, vernieuw en of vul aan. Zo nee, maak aan. Schrijf HTML.
+   * TODO geen zuivere functie.
+   * @param nieuweDebug
+   */
   voegToeAanWorkers(nieuweDebug: workersO) {
     const index = this.workers.findIndex(
       (worker) => worker.naam === nieuweDebug.naam
@@ -37,7 +52,12 @@ class ConsoleData {
     schrijfHTML();
   }
 
-  print() {
+  /**
+   * Maak tabel met data per worker.
+   * TODO tabel is ontstaan uit verwarring. Maak fatsoenlijke kaarten
+   * TODO sommige data zal niet converteerbaar zijn naar string. Zet die in een JSON object en maak die op
+   */
+  get workerDataTabel() {
     const namen = `
       <thead>
         ${this.workers.map((w) => `<th>${w.naam}</th>`).join('')}
@@ -60,6 +80,12 @@ class ConsoleData {
       </table>
     `;
   }
+  /**
+   * helper van workerDataTabel
+   * klapt een object uit
+   * TODO gaat de fout in bij diep object.
+   * @param object
+   */
   objectNaarTekst(object: any) {
     const r: string[] = [];
     for (let a in object) {
@@ -69,61 +95,101 @@ class ConsoleData {
   }
 }
 
-interface workersO {
-  [index: string]: string | object;
-  naam: string;
-  data: object;
-}
-
 const consData = new ConsoleData();
 
-parentPort?.on('message', (bericht: any) => {
-  if (bericht.type === 'debug') {
-    if (
-      !bericht.data.hasOwnProperty('naam') ||
-      !bericht.data.hasOwnProperty('data')
-    ) {
-      parentPort?.postMessage({
-        type: 'console',
-        data: 'debug object verkeerd gevormd'
+parentPort?.on(
+  'message',
+  (bericht: KraakDebugBericht | KraakBerichtAanWorker) => {
+    switch (bericht.type) {
+      case 'subtaak-delegatie':
+        consData.voegToeAanWorkers(bericht.data as workersO);
+        break;
+      case 'start':
+        startStatWorker();
+        break;
+      case 'stop':
+        stopStatWorker();
+        break;
+      default:
+        throw new Error('ongedefinieerd in swithc'); // TODO
+    }
+  }
+);
+
+/**
+ * Haalt CSS op en cached t.
+ */
+const statWorkerCSS = {
+  haalOp: function (this: any) {
+    if (fs.existsSync(__dirname + '/../../public/statWorker.css')) {
+      // TODO via config
+      return (this.b = fs.readFileSync(
+        __dirname + '/../../public/statWorker.css', // TODO via config
+        {
+          encoding: 'utf-8'
+        }
+      ));
+    } else {
+      consData.voegToeAanWorkers({
+        naam: 'statWorker',
+        data: {
+          log: 'stat worker css niet gevonden'
+        }
       });
     }
-
-    consData.voegToeAanWorkers(bericht.data as workersO);
+    return '';
+  },
+  b: '',
+  get bestand(): string {
+    if (!this.b) {
+      return this.haalOp();
+    } else {
+      return this.b;
+    }
   }
-
-  if (bericht.type === 'start') {
-    schrijfHTML().then(() => {
-      open('http://localhost:8080');
-    });
-
+};
+async function startStatWorker(): Promise<void> {
+  const CSS = await statWorkerCSS.bestand;
+  schrijfHTML().then(() => {
+    open('http://localhost:8080');
     parentPort?.postMessage({
       type: 'console',
-      data: 'klaar'
+      data: 'gestart'
     });
-  }
-  if (bericht.type === 'stop') {
-    consData.streaming = false;
-    schrijfHTML().then(() => {
-      setTimeout(function () {
-        parentPort?.postMessage({
-          type: 'status',
-          data: 'dood'
-        });
-        process.exit();
-      }, 2500); // vanwege reload tijd chrome.
-    });
-  }
-});
+  });
+}
 
+/**
+ * sluit statpagina af, meld status aan controller.
+ */
+function stopStatWorker(): void {
+  consData.streaming = false;
+  schrijfHTML().then(() => {
+    setTimeout(function () {
+      parentPort?.postMessage({
+        type: 'status',
+        data: 'dood'
+      });
+      process.exit();
+    }, 2500); // vanwege reload tijd chrome.
+  });
+}
+
+/**
+ * CLASSIC SLORDIGE SHIT. deal with it. Was heel ding met websockets aan het maken blablabla en en en en... fuck it. Smerig & effectief.
+ * draait HTML & JS uit in index.html afhankelijk van consData.streaming.
+ * of hij ververst, of hij sluit.
+ */
 async function schrijfHTML() {
+  const css = statWorkerCSS.bestand;
+
   const jsReload = `
     const rt = 1000
      
     setTimeout(()=>{
       location.reload()
     }, rt)
-  `;
+  `; // TODO naar bestand
 
   const jsAfsluiten = `
     const rt = 5000;
@@ -140,7 +206,7 @@ async function schrijfHTML() {
         close();
       }
     }, rt)
-  `;
+  `; // TODO naar bestand
 
   const htmlReload = '';
   const htmlAfsluiten = `
@@ -155,7 +221,7 @@ async function schrijfHTML() {
   const htmlBlob = consData.streaming ? htmlReload : htmlAfsluiten;
 
   fs.writeFileSync(
-    __dirname + '/../../public/index.html',
+    __dirname + '/../../public/index.html', // TODO via config
     `
   <!DOCTYPE html>
   <body>
@@ -163,35 +229,13 @@ async function schrijfHTML() {
       <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css'>
       <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"> 
       <style>
-        * {
-          font-family: 'Roboto', sans-serif;
-        }
-        th, td {
-          padding: 10px;
-          text-align: center;
-        }
-        th {
-          background-color: black;
-          color: white;
-          font-variant: small-caps
-        }
-        td {
-          background-color: white;
-        }
-        body {
-          background-color: #f2f2f2;
-          display: flex;
-          justify-content: space-around;
-          align-items: center;
-          min-height: 100vh;
-        }
-
+        ${css}
       </style>
     </head>
     <html>
         <div class='kraak-stats'>
           ${htmlBlob}
-          ${consData.print()}
+          ${consData.workerDataTabel}
         </div>
       <script>
         ${jsBlob}
@@ -201,4 +245,10 @@ async function schrijfHTML() {
   `
   );
   return true;
+}
+
+interface workersO {
+  [index: string]: any;
+  naam: string;
+  data: object;
 }

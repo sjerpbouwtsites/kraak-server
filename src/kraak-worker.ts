@@ -1,9 +1,12 @@
-import { parentPort, Worker } from 'worker_threads';
-
+import { Worker } from 'worker_threads';
+import nuts from './nuts/generiek';
 /**
  * Leeft in de master thread context.
- * Wrapper voor gedeelde functies van workers zoals console loggen,
- * status opvragen.
+ * Is een REFERENTIE aan de worker, niet de worker zelf.
+ * Initieerd de Worker. Geeft de worker naam.
+ * Wrapper voor postMessage áán de worker zodat dit getyped kan worden
+ * Zet in controller context message event handlers zodat workers kunnen consol.loggen en console-lijsten (log zonder [object object] onzin)
+ *
  */
 export class KraakWorker extends Worker {
   public workerLocatie: string | null = null;
@@ -17,22 +20,16 @@ export class KraakWorker extends Worker {
     this.zetOnMessage();
     return this;
   }
-  objectNaarTekst(object: any) {
-    const r: string[] = [];
-    for (let a in object) {
-      r.push(`${a}:  - ${object[a]}`);
-    }
-    return r.join('\n');
-  }
+
   /**
    * als worker message naar master thread stuurt.
    */
-  zetOnMessage() {
+  zetOnMessage(): KraakWorker {
     this.on('message', (bericht: KraakBerichtVanWorker) => {
       if (bericht.type === 'console-lijst') {
         console.log(`
         ${this.workerNaam} worker
-        ${this.objectNaarTekst(bericht.data)}`);
+        ${nuts.objectNaarTekst(bericht.data)}`);
       }
 
       if (bericht.type === 'console') {
@@ -41,17 +38,20 @@ export class KraakWorker extends Worker {
         ${bericht.data}`);
       }
     });
+    return this;
   }
-  zetNaam(workerLocatie: string) {
+  zetNaam(workerLocatie: string): KraakWorker {
     const wl = workerLocatie.split('/');
     this.workerNaam = wl[wl.length - 1].replace('.js', '');
+    return this;
   }
   /**
    * wrapper om type KraakWorkerBericht te verplichten
    * @param bericht KraakWorkerBericht type
    */
-  berichtAanWorker(bericht: KraakBerichtAanWorker) {
+  berichtAanWorker(bericht: KraakBerichtAanWorker): KraakWorker {
     this.postMessage(bericht);
+    return this;
   }
 }
 
@@ -72,6 +72,21 @@ export interface KraakBerichtVanWorker {
 }
 
 export interface KraakBerichtAanWorker {
-  type: 'start' | 'stop' | 'subtaak-delegatie' | 'debug';
+  type: 'start' | 'stop' | 'subtaak-delegatie';
   data?: any;
+}
+
+/**
+ * Met de statWorker praat je via KraakDebugBericht.
+ * Naam handig voor juiste kaart indien tabeldata.
+ * Log is het lopende overzicht, bronnen door elkaar.
+ * tabel is het object dat toegevoegd moet worden aan de kaart met de gespecificeerde naam.
+ */
+export interface KraakDebugBericht extends KraakBerichtAanWorker {
+  type: 'subtaak-delegatie';
+  data: {
+    naam?: string;
+    log?: string;
+    tabel?: object;
+  };
 }

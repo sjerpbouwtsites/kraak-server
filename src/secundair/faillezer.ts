@@ -1,5 +1,9 @@
-import fs from 'fs';
-import { parentPort, workerData } from 'worker_threads';
+/**
+ * @file Worker. Ontvangt van controller de dagen waarop is gescraped
+ * en verwerkt die één voor één. Hieruit worden de adressen gehaald en de kvk nummers. Faillissementen
+ */
+
+import { parentPort } from 'worker_threads';
 import { config } from '../config';
 import { KraakBerichtAanWorker, KraakBerichtVanWorker } from '../kraak-worker';
 import {
@@ -7,11 +11,6 @@ import {
   Publicatiecluster,
   publicatieClusterOmschrijving
 } from '../scrapers/rechtbanken';
-
-/**
- * Dit bestand ontvangt vanaf de controller de dagen waarop is gescraped
- * en verwerkt die één voor één. Hieruit worden de adressen gehaald.
- */
 
 parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
   if (bericht.type === 'start') {
