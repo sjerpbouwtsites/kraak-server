@@ -1,3 +1,7 @@
+/**
+ * @file Worker. Ontvangt van controller de dagen waarop is gescraped
+ * en verwerkt die één voor één. Hieruit worden de adressen gehaald en de kvk nummers. Faillissementen
+ */
 (function (factory) {
     if (typeof module === "object" && typeof module.exports === "object") {
         var v = factory(require, exports);
@@ -11,10 +15,6 @@
     Object.defineProperty(exports, "__esModule", { value: true });
     const worker_threads_1 = require("worker_threads");
     const config_1 = require("../config");
-    /**
-     * Dit bestand ontvangt vanaf de controller de dagen waarop is gescraped
-     * en verwerkt die één voor één. Hieruit worden de adressen gehaald.
-     */
     worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (bericht) => {
         if (bericht.type === 'start') {
             //

@@ -1,3 +1,6 @@
+/**
+ * @file Worker. Leest map scrape-res uit voor de laatste succesvolle rechtank scrape en haalt alle missende één voor één op. 'gevulde' scrape resultaten worden als bestand opgeslagen & via referentie aan de controller doorgegeven.
+ */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -31,13 +34,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    // TODO in maken lijst met te scrapen, meenemen wat in meta/rechtbanken/niet gevonden (oid weet ik veel) staat.
+    // TODO implementeren: werk wachtrij
+    // TODO implementeren: status opvragen ism. werk wachtrij
     const worker_threads_1 = require("worker_threads");
     const fs = __importStar(require("fs"));
     const config_1 = require("../config");
     const axios_1 = __importDefault(require("axios"));
-    /**
-     * TODO BESTANDSBESCHRIJVING
-     */
+    // TODO eruit halen en vervangen door statworker.
     const rbScrapeConfig = {
         consoleOpKlaar: true,
         consoleOpScrapeBestandSucces: true
@@ -57,6 +61,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         const dagenTeScrapen = lijstDagenTeScrapen();
         scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {
             if (scrapeExitBoodschap === true && rbScrapeConfig.consoleOpKlaar) {
+                // TODO naar statworker
                 worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
                     type: 'console',
                     data: `ik ben klaar`
@@ -64,16 +69,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                 process.exit();
             }
             else {
+                // TODO naar statworker
                 worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
                     type: 'console',
                     data: `ik heb een onverklaard probleem`
                 });
             }
         });
-    }
-    function routeNaarDatum(routeNaam) {
-        const d = routeNaam.replace('000000.json', '');
-        return new Date(d.substring(0, 4) + '-' + d.substring(4, 6) + '-' + d.substring(6, 8));
     }
     /**
      * lees map scrape-res/rechtbank
@@ -85,12 +87,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         const rechtbankScraperRes = fs.readdirSync(`${config_1.config.pad.scrapeRes}/rechtbank`);
         const laatsteScrape = rechtbankScraperRes[rechtbankScraperRes.length - 1]; // @TODO slap
         const dagenTeScrapen = [];
-        let datumMax = new Date();
+        let datumMax = new Date(); // TODO vervangen met ref naar nuts datumlijst
         datumMax.setDate(datumMax.getDate() - 1); // vandaag niet scrapen, staat mss nog niet online.
         let datumRef = routeNaarDatum(laatsteScrape);
         datumRef.setDate(datumRef.getDate() + 1); // vanaf dag ná laatste scrape gaan kijken
         do {
-            const pushString = datumRef.toISOString().replace(/-/g, '').substring(0, 8);
+            const pushString = datumRef.toISOString().replace(/-/g, '').substring(0, 8); // maak YYYYMMDD
             dagenTeScrapen.push(pushString);
             datumRef.setDate(datumRef.getDate() + 1);
         } while (datumRef < datumMax);
@@ -125,6 +127,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         }
         catch (error) {
             console.log(error); // TODO AARRGHHH lege catch
+            // TODO naar generieke worker catch functie die statworker aanstuurt via controller.
         }
         return true;
     }
@@ -147,28 +150,39 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                     throw new Error('rechtbank JSON geen RechtbankJSON instance. antwoord in temp map');
                 }
                 if (jsonBlob.Instanties.length === 0) {
-                    const rechtbankMeta = JSON.parse(fs.readFileSync(`${config_1.config.pad.scrapeRes}/meta/rechtbankmeta.json`, 'utf-8'));
-                    rechtbankMeta.legeResponses.push(route);
-                    fs.writeFileSync(`${config_1.config.pad.scrapeRes}/meta/rechtbankmeta.json`, JSON.stringify(rechtbankMeta));
-                    scrapeDatumSucces({
-                        type: 'leeg',
-                        route: route
-                    });
+                    scrapeResultaatLeeg(route, scrapeDatumSucces);
                 }
                 else {
-                    const opslagPad = `${config_1.config.pad.scrapeRes}/rechtbank/${route}.json`;
-                    fs.writeFile(opslagPad, JSON.stringify(jsonBlob), () => {
-                        scrapeDatumSucces({
-                            type: 'gevuld',
-                            route: route,
-                            json: jsonBlob
-                        });
-                    });
+                    scrapeResultaatGevuld(jsonBlob, route, scrapeDatumSucces);
                 }
             })
                 .catch((err) => {
-                console.log('TODO!!!');
-                scrapeDatumFaal(err);
+                scrapeDatumFaal(err); // TODO
+            });
+        });
+    }
+    /**
+     * Organisatie functie als de rechtbanken een goed gevormd antwoord geven ZONDER resultaat.
+     */
+    function scrapeResultaatLeeg(route, succesFunc) {
+        const rechtbankMeta = JSON.parse(fs.readFileSync(`${config_1.config.pad.scrapeRes}/meta/rechtbankmeta.json`, 'utf-8'));
+        rechtbankMeta.legeResponses.push(route);
+        fs.writeFileSync(`${config_1.config.pad.scrapeRes}/meta/rechtbankmeta.json`, JSON.stringify(rechtbankMeta));
+        succesFunc({
+            type: 'leeg',
+            route: route
+        });
+    }
+    /**
+     * Organisatie functie als de rechtbanken een goed gevormd antwoord geven MET resultaat.
+     */
+    async function scrapeResultaatGevuld(jsonBlob, route, succesFunc) {
+        const opslagPad = `${config_1.config.pad.scrapeRes}/rechtbank/${route}.json`;
+        return fs.writeFile(opslagPad, JSON.stringify(jsonBlob), () => {
+            succesFunc({
+                type: 'gevuld',
+                route: route,
+                json: jsonBlob
             });
         });
     }
@@ -188,5 +202,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
             return false;
         }
         return true;
+    }
+    function routeNaarDatum(routeNaam) {
+        const d = routeNaam.replace('000000.json', '');
+        return new Date(d.substring(0, 4) + '-' + d.substring(4, 6) + '-' + d.substring(6, 8));
     }
 });

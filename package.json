@@ -5,11 +5,13 @@
   "main": "build/index.js",
   "scripts": {
     "alleen-pre-run": "tsc; node build/pre-run.js",
+    "alleen-eenmalig": "tsc; node build/eenmalig.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "draai": "npm run build; node build/index.js;",
     "lint": "eslint . --ext .ts",
-    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "watch": "npm-watch"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +27,7 @@
     "typescript": "^4.0.2"
   },
   "dependencies": {
+    "onchange": "^7.0.2",
     "save-dev": "0.0.1-security",
     "socket.io": "^2.3.0"
   }

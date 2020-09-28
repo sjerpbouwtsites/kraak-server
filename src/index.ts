@@ -18,7 +18,7 @@ const statsWorker = new KraakWorker('./build/stats/stats.js').berichtAanWorker({
 
 // gebruikt tijdens dev... om fs te bewerken
 try {
-  preRunScripts();
+  preRunScripts({ aantalRechtbankScrapesWeg: 0 });
 } catch (err) {
   statsWorker.berichtAanWorker({
     type: 'subtaak-delegatie',
@@ -29,19 +29,25 @@ try {
   });
 }
 
-nodeVersieControle();
+procesNuts.nodeVersieControle();
 
 async function init() {
-  // const rechtbankScraper = new KraakWorker('./build/scrapers/rechtbanken.js');
-  // const faillissementenLezer = new KraakWorker(
-  //   './build/secundair/faillezer.js'
-  // );
-  // rechtbankScraper.berichtAanWorker({ type: 'start' });
-  // rechtbankScraper.on('message', (bericht: KraakBerichtVanWorker) => {
-  //   if (bericht.type === 'subtaak-delegatie') {
-  //     faillissementenLezer.berichtAanWorker(bericht as KraakBerichtAanWorker);
-  //   }
-  // });
+  const rechtbankScraper = new KraakWorker('./build/scrapers/rechtbanken.js');
+  const faillissementenLezer = new KraakWorker(
+    './build/secundair/faillezer.js'
+  );
+  rechtbankScraper.berichtAanWorker({ type: 'start' });
+  rechtbankScraper.on('message', (bericht: KraakBerichtVanWorker) => {
+    if (bericht.type === 'subtaak-delegatie') {
+      faillissementenLezer.berichtAanWorker(bericht as KraakBerichtAanWorker);
+    }
+  });
+
+  nuts.time(5000).then(() => {
+    // TODO als de scrapers stil zijn e.d. ??
+    procesNuts.stop(statsWorker);
+  });
+
   // draai varia scrapers
   // try {
   //   const installatie = pakScript("installatie");
@@ -76,22 +82,3 @@ async function init() {
 }
 
 init();
-
-nuts.time(5000).then(() => {
-  procesNuts.stop(statsWorker);
-});
-
-/**
- * Als lager dan versie 13, niet draaien.
- */
-function nodeVersieControle() {
-  try {
-    const nodeversie = Number(process.versions.node.split('.')[0]) as number;
-    if (nodeversie < 13) {
-      throw new Error(`node versie te laag. is: ${nodeversie}`);
-    }
-  } catch (error) {
-    console.error(error);
-    process.exit();
-  }
-}

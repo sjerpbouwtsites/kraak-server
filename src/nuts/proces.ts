@@ -23,5 +23,19 @@ export default {
         }
       }
     });
+  },
+  /**
+   * Als lager dan versie 13, niet draaien.
+   */
+  nodeVersieControle() {
+    try {
+      const nodeversie = Number(process.versions.node.split('.')[0]) as number;
+      if (nodeversie < 13) {
+        throw new Error(`node versie te laag. is: ${nodeversie}`);
+      }
+    } catch (error) {
+      console.error(error);
+      process.exit();
+    }
   }
 };

@@ -65,7 +65,7 @@ function lijstDagenTeScrapen(): string[] {
 
   const dagenTeScrapen: string[] = [];
 
-  let datumMax = new Date();
+  let datumMax = new Date(); // TODO vervangen met ref naar nuts datumlijst
   datumMax.setDate(datumMax.getDate() - 1); // vandaag niet scrapen, staat mss nog niet online.
 
   let datumRef = routeNaarDatum(laatsteScrape);
@@ -117,45 +117,6 @@ async function scrapeData(dagenTeScrapen: string[]) {
  * @param datum
  */
 function scrapeDatum(this: any, datum: string): Promise<scrapeDatumAns> {
-  /**
-   * Organisatie functie als de rechtbanken een goed gevormd antwoord geven ZONDER resultaat.
-   */
-  this.scrapeResultaatLeeg = function (route: string, succesFunc: Function) {
-    const rechtbankMeta = JSON.parse(
-      fs.readFileSync(
-        `${config.pad.scrapeRes}/meta/rechtbankmeta.json`,
-        'utf-8'
-      )
-    );
-    rechtbankMeta.legeResponses.push(route);
-    fs.writeFileSync(
-      `${config.pad.scrapeRes}/meta/rechtbankmeta.json`,
-      JSON.stringify(rechtbankMeta)
-    );
-    succesFunc({
-      type: 'leeg',
-      route: route
-    });
-  };
-
-  /**
-   * Organisatie functie als de rechtbanken een goed gevormd antwoord geven MET resultaat.
-   */
-  this.scrapeResultaatGevuld = async function (
-    jsonBlob: any,
-    route: string,
-    succesFunc: Function
-  ) {
-    const opslagPad = `${config.pad.scrapeRes}/rechtbank/${route}.json`;
-    return fs.writeFile(opslagPad, JSON.stringify(jsonBlob), () => {
-      succesFunc({
-        type: 'gevuld',
-        route: route,
-        json: jsonBlob
-      });
-    });
-  };
-
   return new Promise((scrapeDatumSucces, scrapeDatumFaal) => {
     const route = datum.replace(/-/g, '').padEnd(14, '0');
     const url = `https://insolventies.rechtspraak.nl/Services/BekendmakingenService/haalOp/${route}`;
@@ -174,9 +135,9 @@ function scrapeDatum(this: any, datum: string): Promise<scrapeDatumAns> {
         }
 
         if (jsonBlob.Instanties.length === 0) {
-          this.scrapeResultaatLeeg(route, scrapeDatumSucces);
+          scrapeResultaatLeeg(route, scrapeDatumSucces);
         } else {
-          this.scrapeResultaatGevuld(jsonBlob, route, scrapeDatumSucces);
+          scrapeResultaatGevuld(jsonBlob, route, scrapeDatumSucces);
         }
       })
       .catch((err: AxiosError) => {
@@ -184,6 +145,43 @@ function scrapeDatum(this: any, datum: string): Promise<scrapeDatumAns> {
       });
   });
 }
+
+/**
+ * Organisatie functie als de rechtbanken een goed gevormd antwoord geven ZONDER resultaat.
+ */
+function scrapeResultaatLeeg(route: string, succesFunc: Function) {
+  const rechtbankMeta = JSON.parse(
+    fs.readFileSync(`${config.pad.scrapeRes}/meta/rechtbankmeta.json`, 'utf-8')
+  );
+  rechtbankMeta.legeResponses.push(route);
+  fs.writeFileSync(
+    `${config.pad.scrapeRes}/meta/rechtbankmeta.json`,
+    JSON.stringify(rechtbankMeta)
+  );
+  succesFunc({
+    type: 'leeg',
+    route: route
+  });
+}
+
+/**
+ * Organisatie functie als de rechtbanken een goed gevormd antwoord geven MET resultaat.
+ */
+async function scrapeResultaatGevuld(
+  jsonBlob: any,
+  route: string,
+  succesFunc: Function
+) {
+  const opslagPad = `${config.pad.scrapeRes}/rechtbank/${route}.json`;
+  return fs.writeFile(opslagPad, JSON.stringify(jsonBlob), () => {
+    succesFunc({
+      type: 'gevuld',
+      route: route,
+      json: jsonBlob
+    });
+  });
+}
+
 interface scrapeDatumAns {
   type: 'leeg' | 'gevuld';
   route: string;

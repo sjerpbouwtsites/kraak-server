@@ -1,6 +1,7 @@
 import { resolve } from 'path';
 
 export const config: Config = {
+  // TODO naar default
   pad: {
     db: resolve(`${__dirname}/../db`), // buiten build folder
     nuts: resolve(`${__dirname}/nuts`),

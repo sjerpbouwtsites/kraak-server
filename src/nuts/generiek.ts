@@ -35,5 +35,18 @@ export default {
       r.push(`${a}:  - ${oa}`.padStart(inspringing));
     }
     return r.join('\n');
+  },
+  /**
+   * geeft lijst met Date objecten tussen data.
+   */
+  datalijstTussen(beginDatum: Date, totDatum: Date): Date[] {
+    let datumRef = new Date(beginDatum); // geen directe verandering
+    datumRef.setDate(datumRef.getDate() + 1); // vanaf dag ná
+    let r: Date[] = [];
+    do {
+      r.push(new Date(datumRef));
+      datumRef.setDate(datumRef.getDate() + 1);
+    } while (datumRef < totDatum);
+    return r;
   }
 };

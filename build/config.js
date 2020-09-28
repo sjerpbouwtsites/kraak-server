@@ -12,6 +12,7 @@
     exports.config = void 0;
     const path_1 = require("path");
     exports.config = {
+        // TODO naar default
         pad: {
             db: path_1.resolve(`${__dirname}/../db`),
             nuts: path_1.resolve(`${__dirname}/nuts`),

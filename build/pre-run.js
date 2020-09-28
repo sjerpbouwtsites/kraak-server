@@ -1,6 +1,7 @@
 /**
- * Dit script draait elke keer vóór de uitvoering van
+ * @file Dit script draait elke keer vóór de uitvoering van
  * 1. draaien van index.js
+ *
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -32,30 +33,46 @@ var __importStar = (this && this.__importStar) || function (mod) {
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.preRunScripts = void 0;
     const fs = __importStar(require("fs"));
     const config_1 = require("./config");
+    /**
+     * kan overschreven worden vanuit index.ts
+     */
+    const preRunConfig = {
+        aantalRechtbankScrapesWeg: 5
+    };
     /**
      * Tijdens bouwen rechtbanken scrape en verwerking laatste
      * 5 kunnen verwijderen
      */
-    const verwijderLaatsteVijfRechtbankScrapes = function () {
+    const verwijderLaatsteRechtbankScrapes = function (conf) {
         const rbpad = `${config_1.config.pad.scrapeRes}/rechtbank`;
+        const { aantalRechtbankScrapesWeg } = conf || preRunConfig;
         const alleRechtbankScrapes = fs.readdirSync(rbpad);
-        for (let i = 0; i < 5; i++) {
+        const errors = [];
+        for (let i = 0; i < aantalRechtbankScrapesWeg; i++) {
             const teVerwijderen = alleRechtbankScrapes.pop();
             try {
                 fs.unlinkSync(`${rbpad}/${teVerwijderen}`);
             }
             catch (err) {
-                console.error(err);
+                errors.push(err);
             }
         }
+        return errors.length > 0 ? errors : null;
     };
     /**
-     * Runner te gebruiken in index.ts
+     * Runner te gebruiken in index.ts.
+     * geef evt. fouten terug.
      */
-    exports.preRunScripts = function () {
-        verwijderLaatsteVijfRechtbankScrapes();
-    };
+    function default_1(configVanController) {
+        let preE = [];
+        let e = verwijderLaatsteRechtbankScrapes(configVanController);
+        if (!!e && e.length > 0) {
+            preE = preE.concat(e);
+            e = [];
+        }
+        return preE.length > 0 ? preE : null;
+    }
+    exports.default = default_1;
 });

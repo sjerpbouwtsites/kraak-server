@@ -7,7 +7,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "./kraak-worker", "./nuts/proces", "./nuts/generiek", "./stats/indexServer"], factory);
+        define(["require", "exports", "./kraak-worker", "./nuts/proces", "./nuts/generiek", "./stats/indexServer", "./pre-run.js"], factory);
     }
 })(function (require, exports) {
     "use strict";
@@ -15,32 +15,37 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     const kraak_worker_1 = require("./kraak-worker");
     const proces_1 = __importDefault(require("./nuts/proces"));
     const generiek_1 = __importDefault(require("./nuts/generiek"));
-    /**
-     * node http server die public/index.html serft.
-     */
     const indexServer_1 = __importDefault(require("./stats/indexServer"));
+    const pre_run_js_1 = __importDefault(require("./pre-run.js"));
+    // TODO wrapper maken van parentPort die het koppelt aan de controller om zo de berichten te kunnen typen
+    // start http server met statWorker resultaat.
     indexServer_1.default();
-    const statsWorker = new kraak_worker_1.KraakWorker('./build/stats/stats.js');
-    statsWorker.berichtAanWorker({
+    const statsWorker = new kraak_worker_1.KraakWorker('./build/stats/stats.js').berichtAanWorker({
         type: 'start'
     });
     // gebruikt tijdens dev... om fs te bewerken
-    // import { preRunScripts } from './pre-run.js';
-    // preRunScripts();
-    // const url = 'http://localhost:8080';
-    // const connection = new WebSocket(url);
-    nodeVersieControle();
+    try {
+        pre_run_js_1.default({ aantalRechtbankScrapesWeg: 0 });
+    }
+    catch (err) {
+        statsWorker.berichtAanWorker({
+            type: 'subtaak-delegatie',
+            data: {
+                naam: 'pre-run',
+                tabel: err
+            }
+        });
+    }
+    proces_1.default.nodeVersieControle();
     async function init() {
-        // const rechtbankScraper = new KraakWorker('./build/scrapers/rechtbanken.js');
-        // const faillissementenLezer = new KraakWorker(
-        //   './build/secundair/faillezer.js'
-        // );
-        // rechtbankScraper.berichtAanWorker({ type: 'start' });
-        // rechtbankScraper.on('message', (bericht: KraakBerichtVanWorker) => {
-        //   if (bericht.type === 'subtaak-delegatie') {
-        //     faillissementenLezer.berichtAanWorker(bericht as KraakBerichtAanWorker);
-        //   }
-        // });
+        const rechtbankScraper = new kraak_worker_1.KraakWorker('./build/scrapers/rechtbanken.js');
+        const faillissementenLezer = new kraak_worker_1.KraakWorker('./build/secundair/faillezer.js');
+        rechtbankScraper.berichtAanWorker({ type: 'start' });
+        rechtbankScraper.on('message', (bericht) => {
+            if (bericht.type === 'subtaak-delegatie') {
+                faillissementenLezer.berichtAanWorker(bericht);
+            }
+        });
         // draai varia scrapers
         // try {
         //   const installatie = pakScript("installatie");
@@ -77,19 +82,4 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     generiek_1.default.time(5000).then(() => {
         proces_1.default.stop(statsWorker);
     });
-    /**
-     * Als lager dan versie 13, niet draaien.
-     */
-    function nodeVersieControle() {
-        try {
-            const nodeversie = Number(process.versions.node.split('.')[0]);
-            if (nodeversie < 13) {
-                throw new Error(`node versie te laag. is: ${nodeversie}`);
-            }
-        }
-        catch (error) {
-            console.error(error);
-            process.exit();
-        }
-    }
 });

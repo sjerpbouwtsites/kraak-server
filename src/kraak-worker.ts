@@ -33,9 +33,8 @@ export class KraakWorker extends Worker {
       }
 
       if (bericht.type === 'console') {
-        console.log(`
-        ${this.workerNaam} worker
-        ${bericht.data}`);
+        console.log(`${bericht.data} ${this.workerNaam?.padStart(25)} 
+        `);
       }
     });
     return this;

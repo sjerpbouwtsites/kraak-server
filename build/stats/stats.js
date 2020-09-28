@@ -1,3 +1,8 @@
+/**
+ * @file Worker. Houdt bij, per oorsprong, wat voor data actueel is gelogd. Schrijft naar public/index.html de 'luxe console'. Zijn kaartjes met data.
+ * TOEKOMST TODO 'console-rol' soort ticker maken en scheiden van 'data overzicht'.
+ * TODO: naar secundaire workers. (??)
+ */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -16,11 +21,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     const fs_1 = __importDefault(require("fs"));
     const open_1 = __importDefault(require("open"));
     /**
-     * FUCKING SHIT voel me naar maar wilde dit ff bouwen
+     * Waarom is dit een worker? Ik had ruzie met typescript en had er ff geen zin in 😫 TODO class onzin weghalen.
      */
     class ConsoleData {
         constructor() {
+            /**
+             * Of de console-pagina index.html geopend moet zijn en ververst moet worden
+             * of afgesloten.
+             */
             this.streaming = true;
+            /**
+             * Dragers van de te debuggen / tabelleren data.
+             * TODO naam worker is onterecht, kan ook wat anders zijn.
+             */
             this.workers = [
                 {
                     naam: 'test',
@@ -30,9 +43,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                 }
             ];
         }
-        construct() {
-            console.log('hoera');
-        }
+        /**
+         * Indien debugobject bestaat in this.workers, vernieuw en of vul aan. Zo nee, maak aan. Schrijf HTML.
+         * TODO geen zuivere functie.
+         * @param nieuweDebug
+         */
         voegToeAanWorkers(nieuweDebug) {
             const index = this.workers.findIndex((worker) => worker.naam === nieuweDebug.naam);
             if (index !== -1) {
@@ -43,7 +58,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
             }
             schrijfHTML();
         }
-        print() {
+        /**
+         * Maak tabel met data per worker.
+         * TODO tabel is ontstaan uit verwarring. Maak fatsoenlijke kaarten
+         * TODO sommige data zal niet converteerbaar zijn naar string. Zet die in een JSON object en maak die op
+         */
+        get workerDataTabel() {
             const namen = `
       <thead>
         ${this.workers.map((w) => `<th>${w.naam}</th>`).join('')}
@@ -64,6 +84,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
       </table>
     `;
         }
+        /**
+         * helper van workerDataTabel
+         * klapt een object uit
+         * TODO gaat de fout in bij diep object.
+         * @param object
+         */
         objectNaarTekst(object) {
             const r = [];
             for (let a in object) {
@@ -74,46 +100,91 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     }
     const consData = new ConsoleData();
     worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (bericht) => {
-        if (bericht.type === 'debug') {
-            if (!bericht.data.hasOwnProperty('naam') ||
-                !bericht.data.hasOwnProperty('data')) {
-                worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                    type: 'console',
-                    data: 'debug object verkeerd gevormd'
-                });
-            }
-            consData.voegToeAanWorkers(bericht.data);
-        }
-        if (bericht.type === 'start') {
-            schrijfHTML().then(() => {
-                open_1.default('http://localhost:8080');
-            });
-            worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                type: 'console',
-                data: 'klaar'
-            });
-        }
-        if (bericht.type === 'stop') {
-            consData.streaming = false;
-            schrijfHTML().then(() => {
-                setTimeout(function () {
-                    worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                        type: 'status',
-                        data: 'dood'
-                    });
-                    process.exit();
-                }, 2500); // vanwege reload tijd chrome.
-            });
+        switch (bericht.type) {
+            case 'subtaak-delegatie':
+                consData.voegToeAanWorkers(bericht.data);
+                break;
+            case 'start':
+                startStatWorker();
+                break;
+            case 'stop':
+                stopStatWorker();
+                break;
+            default:
+                throw new Error('ongedefinieerd in swithc'); // TODO
         }
     });
+    /**
+     * Haalt CSS op en cached t.
+     */
+    const statWorkerCSS = {
+        haalOp: function () {
+            if (fs_1.default.existsSync(__dirname + '/../../public/statWorker.css')) {
+                // TODO via config
+                return (this.b = fs_1.default.readFileSync(__dirname + '/../../public/statWorker.css', // TODO via config
+                {
+                    encoding: 'utf-8'
+                }));
+            }
+            else {
+                consData.voegToeAanWorkers({
+                    naam: 'statWorker',
+                    data: {
+                        log: 'stat worker css niet gevonden'
+                    }
+                });
+            }
+            return '';
+        },
+        b: '',
+        get bestand() {
+            if (!this.b) {
+                return this.haalOp();
+            }
+            else {
+                return this.b;
+            }
+        }
+    };
+    async function startStatWorker() {
+        const CSS = await statWorkerCSS.bestand;
+        schrijfHTML().then(() => {
+            open_1.default('http://localhost:8080');
+            worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
+                type: 'console',
+                data: 'gestart'
+            });
+        });
+    }
+    /**
+     * sluit statpagina af, meld status aan controller.
+     */
+    function stopStatWorker() {
+        consData.streaming = false;
+        schrijfHTML().then(() => {
+            setTimeout(function () {
+                worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
+                    type: 'status',
+                    data: 'dood'
+                });
+                process.exit();
+            }, 2500); // vanwege reload tijd chrome.
+        });
+    }
+    /**
+     * CLASSIC SLORDIGE SHIT. deal with it. Was heel ding met websockets aan het maken blablabla en en en en... fuck it. Smerig & effectief.
+     * draait HTML & JS uit in index.html afhankelijk van consData.streaming.
+     * of hij ververst, of hij sluit.
+     */
     async function schrijfHTML() {
+        const css = statWorkerCSS.bestand;
         const jsReload = `
     const rt = 1000
      
     setTimeout(()=>{
       location.reload()
     }, rt)
-  `;
+  `; // TODO naar bestand
         const jsAfsluiten = `
     const rt = 5000;
     let afsluitenGaatDoor = true;
@@ -129,7 +200,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         close();
       }
     }, rt)
-  `;
+  `; // TODO naar bestand
         const htmlReload = '';
         const htmlAfsluiten = `
     <div id='afsluit-html' class='afsluit-html'>
@@ -140,42 +211,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
   `;
         const jsBlob = consData.streaming ? jsReload : jsAfsluiten;
         const htmlBlob = consData.streaming ? htmlReload : htmlAfsluiten;
-        fs_1.default.writeFileSync(__dirname + '/../../public/index.html', `
+        fs_1.default.writeFileSync(__dirname + '/../../public/index.html', // TODO via config
+        `
   <!DOCTYPE html>
   <body>
     <head>
       <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css'>
       <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"> 
       <style>
-        * {
-          font-family: 'Roboto', sans-serif;
-        }
-        th, td {
-          padding: 10px;
-          text-align: center;
-        }
-        th {
-          background-color: black;
-          color: white;
-          font-variant: small-caps
-        }
-        td {
-          background-color: white;
-        }
-        body {
-          background-color: #f2f2f2;
-          display: flex;
-          justify-content: space-around;
-          align-items: center;
-          min-height: 100vh;
-        }
-
+        ${css}
       </style>
     </head>
     <html>
         <div class='kraak-stats'>
           ${htmlBlob}
-          ${consData.print()}
+          ${consData.workerDataTabel}
         </div>
       <script>
         ${jsBlob}
