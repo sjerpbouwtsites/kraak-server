@@ -1,17 +1,15 @@
 /**
  * @file Worker. Houdt bij, per oorsprong, wat voor data actueel is gelogd. Schrijft naar public/index.html de 'luxe console'. Zijn kaartjes met data.
  * TOEKOMST TODO 'console-rol' soort ticker maken en scheiden van 'data overzicht'.
- * TODO: naar secundaire workers. (??)
- * TODO DIT IS ECHT EEN ZOOITJE. Maak apart een lijst met workers, een lijst met logs, een lijst met data.
  */
 
 import { parentPort } from 'worker_threads';
-import fs from 'fs';
 import open from 'open';
-import { KraakDebugBericht, KraakBerichtAanWorker } from '../kraak-worker';
+import { KraakBericht, KraakBerichtData } from '../kraak-worker';
 import workersNuts, { workerMetaData } from '../nuts/workers';
 import nuts from '../nuts/generiek';
 import statHTML from './stats-html';
+import config from '../config';
 
 let statsWorkerMeta: workerMetaData = {
   status: 'uit',
@@ -39,65 +37,56 @@ const statHtmlAfsluiten = `
   </div>
 `;
 
-function verwerkNieuweDebug(bericht: KraakDebugBericht) {
-  parentPort?.postMessage({
-    type: 'console',
-    data: nuts.objectNaarTekst(bericht)
-  });
+parentPort?.on('message', (bericht: KraakBericht) => {
+  workersNuts.commandoTypeBerichtBehandelaar(
+    bericht,
+    startStatWorker,
+    stopStatWorker,
+    ruimStatWorkerOp
+  );
+});
 
-  if (bericht.data?.log) {
+parentPort?.on('message', (bericht: KraakBericht) => {
+  if (bericht.type === 'subtaak-delegatie') {
+    verwerkNieuweDebug(
+      bericht.data as KraakBerichtData.Stats,
+      bericht?.workerNaam
+    );
+    statHTMLWrap();
+  }
+});
+
+/**
+ * effectief handler voor on.message type 'subtaak-delegatie'
+ */
+function verwerkNieuweDebug(
+  berichtData: KraakBerichtData.Stats,
+  workerNaam: string = 'onbekend'
+) {
+  if (berichtData?.log) {
     logData.push({
-      naam: bericht.data?.naam ?? 'onbekend',
-      log: bericht.data?.log
+      naam: workerNaam,
+      log: berichtData?.log
     });
   }
-  if (bericht.data?.tabel) {
-    const wn = bericht.data?.naam ?? 'geen-naam';
+  if (berichtData?.tabel) {
+    const wn = workerNaam;
     const eerdereTabelData = tabelData.find((td) => td.naam === wn) ?? false;
     if (!eerdereTabelData) {
       tabelData.push({
-        naam: bericht.data?.naam ?? 'onbekend',
-        tabel: bericht.data?.tabel
+        naam: workerNaam,
+        tabel: berichtData?.tabel
       });
     } else {
       Object.assign(eerdereTabelData, {
-        tabel: bericht.data?.tabel
+        tabel: berichtData?.tabel
       });
     }
   }
-  if (!workersNamen.includes(bericht.data?.naam ?? 'onbekend')) {
-    workersNamen.push(bericht.data?.naam ?? 'onbekend');
+  if (!workersNamen.includes(workerNaam)) {
+    workersNamen.push(workerNaam);
   }
 }
-parentPort?.on(
-  'message',
-  (bericht: KraakDebugBericht | KraakBerichtAanWorker) => {
-    switch (bericht.type) {
-      case 'subtaak-delegatie':
-        verwerkNieuweDebug(bericht as KraakDebugBericht);
-        statHTMLWrap();
-        break;
-      case 'start':
-        startStatWorker();
-        break;
-      case 'stop':
-        stopStatWorker();
-        break;
-      default:
-        statsWorkerMeta = workersNuts.zetMetaData(
-          statsWorkerMeta,
-          {
-            fout: [
-              ...statsWorkerMeta.fout,
-              new Error('ongedefinieerd in swithc')
-            ]
-          },
-          true,
-          false
-        );
-    }
-  }
-);
 
 function statHTMLWrap(): Promise<boolean> {
   const s = statsWorkerMeta.streaming;
@@ -105,16 +94,13 @@ function statHTMLWrap(): Promise<boolean> {
   const HTML = s ? statHtmlReload : statHtmlAfsluiten;
   const CSS = true ? StatsIndexCSS.bestand : StatsIndexCSS.bestand;
   return statHTML(logData, tabelData, workersNamen, CSS, JS, HTML).then(
-    (r: any) => {
-      parentPort?.postMessage({ type: 'console', data: 'html gebouwd' });
-      return r;
-    }
+    (r: any) => r
   );
 }
 
-async function startStatWorker(): Promise<void> {
+function startStatWorker(): void {
   statHTMLWrap().then(() => {
-    open('http://localhost:8080');
+    open(`http://localhost:${config.server.publicPort}`);
     workersNuts.log('gestart');
   });
 }
@@ -126,17 +112,19 @@ function stopStatWorker(): void {
   statsWorkerMeta.streaming = false;
   statHTMLWrap().then(() => {
     setTimeout(function () {
-      statsWorkerMeta = workersNuts.zetMetaData(
-        statsWorkerMeta,
-        {
-          status: 'dood'
-        },
-        true,
-        false
-      );
+      parentPort?.postMessage({
+        type: 'status-antwoord',
+        data: {
+          status: 'opgeruimd' // moet afhankelijk van het pad worden.s
+        }
+      });
       process.exit();
     }, 2500); // vanwege reload tijd chrome.
   });
+}
+
+function ruimStatWorkerOp(): void {
+  //
 }
 
 export interface LogStuk {

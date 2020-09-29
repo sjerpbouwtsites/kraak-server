@@ -5,12 +5,12 @@
 
 import { parentPort } from 'worker_threads';
 import config from '../config';
-import { KraakBerichtAanWorker, KraakBerichtVanWorker } from '../kraak-worker';
+import { KraakBericht } from '../kraak-worker';
 import {
   RechtbankJSON,
   Publicatiecluster,
   publicatieClusterOmschrijving
-} from '../scrapers/rechtbanken';
+} from '../primair/rechtbanken';
 import workersNuts, { workerMetaData } from '../nuts/workers';
 
 /**
@@ -21,35 +21,45 @@ let faillezerMeta: workerMetaData = {
   fout: []
 };
 
-parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
-  if (bericht.type === 'start') {
-    faillezerMeta = workersNuts.zetMetaData(
-      faillezerMeta,
-      {
-        status: 'gestart'
-      },
-      true,
-      false
-    );
-  }
-  if (bericht.type === 'stop') {
-    faillezerMeta = workersNuts.zetMetaData(
-      faillezerMeta,
-      {
-        status: 'gestart'
-      },
-      true,
-      false
-    );
-    process.exit();
-  }
-  if (bericht.type === 'subtaak-delegatie' && !!bericht.data) {
-    const antwoord = verwerkFaillissementScrape(bericht.data as RechtbankJSON);
-    const berichtTerug: KraakBerichtVanWorker = {
-      type: 'console',
-      data: antwoord
-    };
-    parentPort?.postMessage(berichtTerug);
+parentPort?.on('message', (bericht: KraakBericht) => {
+  workersNuts.commandoTypeBerichtBehandelaar(
+    bericht,
+    initFaillezer,
+    stopFaillezer,
+    ruimScraperOp
+  );
+});
+
+function initFaillezer() {
+  // faillezerMeta = workersNuts.zetMetaData(
+  //   faillezerMeta,
+  //   {
+  //     status: 'gestart'
+  //   },
+  //   true,
+  //   false
+  // );
+}
+
+function stopFaillezer() {
+  // faillezerMeta = workersNuts.zetMetaData(
+  //   faillezerMeta,
+  //   {
+  //     status: 'gestopt'
+  //   },
+  //   true,
+  //   false
+  // );
+  process.exit();
+}
+
+function ruimScraperOp() {
+  //
+}
+
+parentPort?.on('message', (bericht: KraakBericht) => {
+  if (bericht.type === 'subtaak-delegatie' && bericht.data) {
+    verwerkFaillissementScrape(bericht.data as RechtbankJSON);
   }
 });
 
@@ -178,8 +188,6 @@ function verwerkPublicatieCluster(
     ${kvk.kvkNummer} ${kvk.datum} ${kvk.faillissementsID}
     `;
   });
-
-  gevondenKvK;
 }
 
 interface adresMetDatum {
@@ -202,32 +210,3 @@ interface TijdelijkPublicatie {
   type: publicatieClusterOmschrijving;
   datum: string;
 }
-
-// function relevantePublicatieClusters(route) {
-//   const toegestaneClusters = opties.toegestaneClusters;
-//   const ontoegestaneClusters = opties.ontoegestaneClusters;
-
-//   return new Promise((resolve, reject) => {
-//     try {
-//       const responseBestand = nuts.pakOpslag(`responses/rechtbank/${route}`);
-//       const publicatieClusters = responseBestand.Instanties.map((instantie) => {
-//         return instantie.Publicatieclusters;
-//       })
-//         .flat()
-//         .filter((pc) => {
-//           const pco = pc.PublicatieclusterOmschrijving;
-//           if (toegestaneClusters.includes(pco)) {
-//             return true;
-//           } else if (!ontoegestaneClusters.includes(pco)) {
-//             console.log('pc cluster omschrijving onbekend: ' + pco);
-//             return false;
-//           } else {
-//             return false;
-//           }
-//         });
-//       resolve(publicatieClusters);
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-// }

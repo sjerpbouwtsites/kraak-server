@@ -3,7 +3,7 @@
  * cq het node process, of het leven van de controller index.ts
  */
 
-import { KraakBerichtVanWorker, KraakWorker } from '../kraak-worker';
+import { KraakBericht, KraakBerichtData, KraakWorker } from '../kraak-worker';
 import nuts from './generiek';
 
 export default {
@@ -13,11 +13,13 @@ export default {
    */
   stop(statsWorker: KraakWorker) {
     statsWorker.berichtAanWorker({
-      type: 'stop'
+      type: 'commando',
+      data: { commando: 'stop' }
     });
-    statsWorker.on('message', function (bericht: KraakBerichtVanWorker) {
-      if (bericht.type === 'status') {
-        if (bericht?.data?.tabel?.status === 'dood') {
+    statsWorker.on('message', function (bericht: KraakBericht) {
+      if (bericht.type === 'status-antwoord') {
+        const bd = bericht.data as KraakBerichtData.StatusAntwoord;
+        if (bd.status === 'opgeruimd') {
           process.exit();
         } else {
           setTimeout(() => {

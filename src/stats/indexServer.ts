@@ -13,10 +13,6 @@ export default async function (): Promise<http.Server | Error> {
   try {
     return http
       .createServer(function (req, res) {
-        parentPort?.postMessage({
-          type: 'console',
-          data: 'maak server jo!'
-        });
         const indexHTML = fs.readFileSync(`${config.pad.public}/index.html`);
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.write(indexHTML);

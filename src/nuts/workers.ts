@@ -3,7 +3,7 @@
  */
 
 import { parentPort } from 'worker_threads';
-import { KraakDebugData, KraakBerichtVanWorker } from '../kraak-worker';
+import { KraakBerichtData, KraakBericht } from '../kraak-worker';
 
 export default {
   /**
@@ -11,25 +11,27 @@ export default {
    * @param logbericht string
    */
   log(logbericht: string) {
-    parentPort?.postMessage({
-      type: 'status',
+    const ppMessage: KraakBericht = {
+      type: 'stats',
       data: {
         log: logbericht
-      }
-    } as KraakBerichtVanWorker);
+      } as KraakBerichtData.Stats
+    };
+    parentPort?.postMessage(ppMessage);
   },
   /**
    *
    * naam wordt toegevoegd door kraak-worker, waar het quasi-doorheen gaat.
    * @param data kan ieder object zijn.
    */
-  tabel(data: object) {
-    parentPort?.postMessage({
-      type: 'status',
+  tabel(teTabelleren: object) {
+    const ppMessage: KraakBericht = {
+      type: 'stats',
       data: {
-        tabel: data
-      }
-    } as KraakBerichtVanWorker);
+        tabel: teTabelleren
+      } as KraakBerichtData.Stats
+    };
+    parentPort?.postMessage(ppMessage);
   },
   /**
    * Kort voor de parentPort methode.
@@ -42,13 +44,43 @@ export default {
     });
   },
   /**
+   * bericht type commando mag slechts start, stop en opruimen zijn.
+   * Dat kunnen drie callbacks ook prima generiek.
+   * @param bericht
+   * @param startCallback
+   * @param stopCallback
+   * @param opruimenCallback
+   */
+  commandoTypeBerichtBehandelaar(
+    bericht: KraakBericht,
+    startCallback: Function,
+    stopCallback: Function,
+    opruimenCallback: Function
+  ): void {
+    if (bericht.type !== 'commando') return;
+    const { commando } = bericht.data as KraakBerichtData.Commando;
+    switch (commando) {
+      case 'start':
+        startCallback();
+        break;
+      case 'stop':
+        stopCallback();
+        break;
+      case 'opruimen':
+        opruimenCallback();
+        break;
+      default:
+        throw new Error('bericht misvormd');
+    }
+  },
+  /**
    * Bewerkt meta data object van workers en geeft dat terug.
    * roept statsworker aan met meta data object.
    * @param metaObject bestaand data object van worker.
    * @param dataObject nieuw op te slane data.
    * @param tabel boolean, of de tabel herbouwt wordt. true.
    * @param log boolean, of alle entrees van de dataObject in log komen. S
-   * @returns metaObject
+   * @returns metaObject // TODO gaat mss helemaal er uit
    */
   zetMetaData(
     metaObject: any,

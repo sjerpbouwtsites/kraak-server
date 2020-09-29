@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import config from '../config';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import nuts from '../nuts/generiek';
-import { KraakBerichtAanWorker } from '../kraak-worker';
+import { KraakBericht, KraakBerichtData } from '../kraak-worker';
 import workersNuts, { workerMetaData } from '../nuts/workers';
 
 /**
@@ -19,16 +19,13 @@ let rechtbankMeta: workerMetaData = {
   werkTeDoen: [] // volgt hier dagenTeScrapen
 };
 
-parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
-  if (bericht.type === 'start') {
-    rechtbankMeta = workersNuts.zetMetaData(rechtbankMeta, {
-      status: 'gestart'
-    });
-    initScraper();
-  }
-  if (bericht.type === 'stop') {
-    stopScaper();
-  }
+parentPort?.on('message', (bericht: KraakBericht) => {
+  workersNuts.commandoTypeBerichtBehandelaar(
+    bericht,
+    initScraper,
+    stopScaper,
+    ruimScraperOp
+  );
 });
 
 /**
@@ -74,6 +71,12 @@ function stopScaper() {
   } else {
     process.exit();
   }
+}
+/**
+ *
+ */
+function ruimScraperOp() {
+  workersNuts.log('ruim scraper op aangeroepen maar eigenljik leeg');
 }
 
 /**

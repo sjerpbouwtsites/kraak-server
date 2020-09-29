@@ -1,17 +1,41 @@
 import { Worker } from 'worker_threads';
 import { parentPort } from 'worker_threads';
-import nuts from './nuts/generiek';
 /**
  * Leeft in de master thread context.
  * Is een REFERENTIE aan de worker, niet de worker zelf.
  * Initieerd de Worker. Geeft de worker naam.
- * Wrapper voor postMessage áán de worker zodat dit getyped kan worden
+ * Wrapper voor postMessage áán de worker zodat dit getyped kan worden.
+ * Via typing is alle communicatie geregeld. Zie de type defs.
+ *
  * Zet in controller context message event handlers zodat workers kunnen consol.loggen en console-lijsten (log zonder [object object] onzin)
  *
  */
 export class KraakWorker extends Worker {
   public workerLocatie: string | null = null;
   public workerNaam: string | null = null;
+  /**
+   * ! primaire scrapers weten zelf hun werk dus bepalen zelf of ze wachtend zijn
+   * ! secundaire scrapers horen van hun meester-scraper of ze mogelijk nog werk krijgen.
+
+   * betreft allemaal het Worker proces.
+   * 
+   * uit          - ~ is onopgestart
+   * gestart      - ~ is opgestart, doet *nog* geen werk.
+   * lekker-bezig  - ~ is opgestart, en is met werk bezig.
+   * afwachtend   - ~ is opgestart, heeft nu geen werk, of meer komt onduidelijk
+   * afgekapt     - ~ is opgelegd gestopt, maar heeft nog werk hebben.
+   * mss-afgekapt - ~ is opgelegd gestopt,
+   *                   maar had mogelijk meer werk gekregen.
+   * verloren     - ~ gestopt door een uncaughtException
+   * foute-limbo  - ~ is ogestart, ving fout af, zit nu vast
+   * klaar        - ~ is opgestart, heeft nooit meer werk.
+   * opgeruimd    - ~ is gestopt, heeft nooit meer werk.
+   */
+  public workerThreadStatus: WorkerThreadStatus = 'uit';
+  /**
+   * bepaalt door in welk mapje de worker zit.
+   */
+  public workerArbeidsRelatie: WorkerArbeidsrelatie;
 
   /**
    * referentie naar statsWorker Worker class instance
@@ -20,7 +44,9 @@ export class KraakWorker extends Worker {
 
   constructor(workerLocatie: string) {
     super(workerLocatie);
-
+    this.workerArbeidsRelatie = workerLocatie.includes('primair')
+      ? 'primair'
+      : 'secundair';
     this.zetNaam(workerLocatie);
 
     this.zetOnMessage();
@@ -49,7 +75,7 @@ export class KraakWorker extends Worker {
    * deze is handig erbij
    * @deprecated
    */
-  console(bericht: KraakBerichtVanWorker) {
+  console(bericht: KraakBericht) {
     console.log(`${bericht.data} ${this.workerNaam?.padStart(25)}     `);
   }
 
@@ -57,34 +83,25 @@ export class KraakWorker extends Worker {
    * als worker message naar master thread stuurt.
    */
   zetOnMessage(): KraakWorker {
-    this.on('message', (bericht: KraakBerichtVanWorker) => {
+    this.on('message', (bericht: KraakBericht) => {
       if (bericht.type === 'console') {
         this.console(bericht);
       }
 
-      if (bericht.type === 'status') {
+      if (bericht.type === 'stats') {
         if (!this.statsWorker) {
           throw new Error(`KOPPEL EERST DE STATWORKER AAN ${this.workerNaam}`);
           return;
         }
-
-        if (!bericht?.data.tabel && !bericht?.data.log) {
-          parentPort?.postMessage({
-            type: 'console',
-            data: `${this.workerNaam} statusUpdate object niet goed gevormd.`
-          });
-        }
-
-        const debugBericht: KraakDebugBericht = {
+        const d = bericht.data as KraakBerichtData.Stats;
+        this.statsWorker?.berichtAanWorker({
           type: 'subtaak-delegatie',
           data: {
-            log: bericht?.data?.log,
-            naam: bericht?.data?.naam || this.workerNaam || 'onbekend',
-            tabel: bericht?.data?.tabel
+            log: d.log,
+            naam: bericht.workerNaam || this.workerNaam || 'onbekend',
+            tabel: d.tabel
           }
-        };
-
-        this.statsWorker?.berichtAanWorker(debugBericht);
+        });
       }
     });
     return this;
@@ -98,36 +115,78 @@ export class KraakWorker extends Worker {
    * wrapper om type KraakWorkerBericht te verplichten
    * @param bericht KraakWorkerBericht type
    */
-  berichtAanWorker(bericht: KraakBerichtAanWorker): KraakWorker {
+  berichtAanWorker(bericht: KraakBericht): KraakWorker {
     this.postMessage(bericht);
     return this;
   }
 }
 
-export interface KraakBerichtVanWorker {
-  workerNaam?: string | null;
-  data?: any;
-  type: 'console' | 'subtaak-delegatie' | 'status';
-}
+export type WorkerThreadStatus =
+  | 'uit'
+  | 'gestart'
+  | 'lekker-bezig'
+  | 'afwachtend'
+  | 'afgekapt'
+  | 'mss-afgekapt'
+  | 'verloren'
+  | 'vastgelopen'
+  | 'klaar'
+  | 'opgeruimd';
 
-export interface KraakBerichtAanWorker {
-  type: 'start' | 'stop' | 'subtaak-delegatie';
-  data?: any;
-}
+export type WorkerThreadCommandos = 'start' | 'stop' | 'opruimen';
+
+export type WorkerArbeidsrelatie = 'primair' | 'secundair';
+
+export type KraakBerichtType =
+  | 'subtaak-delegatie'
+  | 'stats'
+  | 'status-verzoek'
+  | 'status-antwoord'
+  | 'commando'
+  | 'console';
 
 /**
- * Met de statWorker praat je via KraakDebugBericht.
- * Naam handig voor juiste kaart indien tabeldata.
- * Log is het lopende overzicht, bronnen door elkaar.
- * tabel is het object dat toegevoegd moet worden aan de kaart met de gespecificeerde naam.
+ * Via typing zijn de messages tussen threads georganiseerd.
+ * KraakBericht.vanWorker is typisch van worker naar controller.
+ * KraakBericht.aanWorker is typisch van controller naar worker.
+ * maar zou ook kunnen veranderen.
+ *
+ * BerichtType:
+ *   subtaak-delegatie is hoe secundaire workers aan het werk
+ *   gezet worden.
+ *   stats zijn de statistieken uit de threads omhoog. Worden in kraak-worker, controller dus, als subtaak-delegatie naar de stats worker gestuurd.
+ *   status-verzoek  verzoekt om rapportage met WorkerThreadStatus
+ *   status-antwoord is alleen reactie op status-verzoek
+ *   commando veroorzaakt starten, stoppen, etc. Beperkt door relaties.
  */
-export interface KraakDebugBericht extends KraakBerichtAanWorker {
-  type: 'subtaak-delegatie';
-  data: KraakDebugData;
+
+export interface KraakBericht {
+  type: KraakBerichtType;
+  workerNaam?: string;
+  data:
+    | KraakBerichtData.SubtaakDelegatie
+    | KraakBerichtData.Stats
+    | KraakBerichtData.StatusVerzoek
+    | KraakBerichtData.StatusAntwoord
+    | KraakBerichtData.Commando;
 }
 
-export interface KraakDebugData {
-  naam?: string;
-  log?: string;
-  tabel?: object;
+export namespace KraakBerichtData {
+  export interface SubtaakDelegatie {
+    [index: string]: any;
+  }
+  export interface Stats {
+    log?: string;
+    tabel?: object;
+  }
+  export interface StatusVerzoek {
+    [index: string]: never;
+  }
+  export interface StatusAntwoord {
+    status: WorkerThreadStatus;
+    fout?: Error; // indien status
+  }
+  export interface Commando {
+    commando: WorkerThreadCommandos;
+  }
 }

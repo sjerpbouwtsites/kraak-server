@@ -1,8 +1,4 @@
-import {
-  KraakWorker,
-  KraakBerichtVanWorker,
-  KraakBerichtAanWorker
-} from './kraak-worker';
+import { KraakWorker, KraakBericht } from './kraak-worker';
 import procesNuts from './nuts/proces';
 import nuts from './nuts/generiek';
 import startStatsServer from './stats/indexServer';
@@ -12,8 +8,10 @@ startStatsServer();
 
 const statsWorker = new KraakWorker('./build/stats/stats.js');
 statsWorker.koppelStatsWorker();
-statsWorker.berichtAanWorker({ type: 'start' });
-
+statsWorker.berichtAanWorker({
+  type: 'commando',
+  data: { commando: 'start' }
+});
 // gebruikt tijdens dev... om fs te bewerken
 try {
   preRunScripts({ aantalRechtbankScrapesWeg: 0 });
@@ -36,10 +34,13 @@ async function init() {
     './build/secundair/faillezer.js'
   );
   faillissementenLezer.koppelStatsWorker(statsWorker);
-  rechtbankScraper.berichtAanWorker({ type: 'start' });
-  rechtbankScraper.on('message', (bericht: KraakBerichtVanWorker) => {
+  rechtbankScraper.berichtAanWorker({
+    type: 'commando',
+    data: { commando: 'start' }
+  });
+  rechtbankScraper.on('message', (bericht: KraakBericht) => {
     if (bericht.type === 'subtaak-delegatie') {
-      faillissementenLezer.berichtAanWorker(bericht as KraakBerichtAanWorker);
+      faillissementenLezer.berichtAanWorker(bericht as KraakBericht);
     }
   });
 
