@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "http", "fs"], factory);
+        define(["require", "exports", "http", "fs", "worker_threads"], factory);
     }
 })(function (require, exports) {
     "use strict";
@@ -18,15 +18,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     // TODO hele public map publiceren met server.
     const http_1 = __importDefault(require("http"));
     const fs_1 = __importDefault(require("fs"));
+    const worker_threads_1 = require("worker_threads");
     async function default_1() {
-        return http_1.default
-            .createServer(function (req, res) {
-            const indexHTML = fs_1.default.readFileSync(__dirname + '/../../public/index.html'); // TODO van nuts afhalen
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.write(indexHTML);
-            res.end();
-        })
-            .listen(8080); // TODO uit opties halen
+        try {
+            return http_1.default
+                .createServer(function (req, res) {
+                worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
+                    type: 'console',
+                    data: 'maak server jo!'
+                });
+                const indexPad = `${__dirname}/../public/index.html`;
+                const indexHTML = fs_1.default.readFileSync(indexPad); // TODO van nuts afhalen
+                res.writeHead(200, { 'Content-Type': 'text/html' });
+                res.write(indexHTML);
+                res.end();
+            })
+                .listen(8080); // TODO uit opties halen
+        }
+        catch (e) {
+            return new Error(e);
+        }
     }
     exports.default = default_1;
 });

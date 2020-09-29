@@ -23,12 +23,15 @@
                 type: 'stop'
             });
             statsWorker.on('message', function (bericht) {
+                var _a, _b;
                 if (bericht.type === 'status') {
-                    if (bericht.data === 'dood') {
+                    if (((_b = (_a = bericht === null || bericht === void 0 ? void 0 : bericht.data) === null || _a === void 0 ? void 0 : _a.tabel) === null || _b === void 0 ? void 0 : _b.status) === 'dood') {
                         process.exit();
                     }
                     else {
-                        throw new Error('statsworker wilt niet dood??' + bericht.data);
+                        setTimeout(() => {
+                            throw (new Error('DUURT LANG afsluiten wtf'), process.exit());
+                        }, 2000);
                     }
                 }
             });

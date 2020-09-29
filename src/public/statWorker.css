@@ -1,0 +1,35 @@
+/* 
+  Ik kreeg niet zo snel uitgevogeld hoe die server te configureren een bepaalde map te server. Dus dit bestand wordt uitgelezen en in de HTML gekwakt in stats.ts 🖤
+*/
+
+* {
+  font-family: 'Roboto', sans-serif;
+}
+th,
+td {
+  padding: 10px;
+  text-align: center;
+}
+th {
+  background-color: black;
+  color: white;
+  font-variant: small-caps;
+}
+td {
+  background-color: white;
+}
+body {
+  background-color: #f2f2f2;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.log-stuk {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 2px;
+  list-style-type: none;
+}

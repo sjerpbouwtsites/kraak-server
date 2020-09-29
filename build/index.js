@@ -20,9 +20,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     // TODO wrapper maken van parentPort die het koppelt aan de controller om zo de berichten te kunnen typen
     // start http server met statWorker resultaat.
     indexServer_1.default();
-    const statsWorker = new kraak_worker_1.KraakWorker('./build/stats/stats.js').berichtAanWorker({
-        type: 'start'
-    });
+    const statsWorker = new kraak_worker_1.KraakWorker('./build/stats/stats.js');
+    statsWorker.koppelStatsWorker();
+    statsWorker.berichtAanWorker({ type: 'start' });
     // gebruikt tijdens dev... om fs te bewerken
     try {
         pre_run_js_1.default({ aantalRechtbankScrapesWeg: 0 });
@@ -41,15 +41,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         const rechtbankScraper = new kraak_worker_1.KraakWorker('./build/scrapers/rechtbanken.js');
         rechtbankScraper.koppelStatsWorker(statsWorker);
         const faillissementenLezer = new kraak_worker_1.KraakWorker('./build/secundair/faillezer.js');
+        faillissementenLezer.koppelStatsWorker(statsWorker);
         rechtbankScraper.berichtAanWorker({ type: 'start' });
         rechtbankScraper.on('message', (bericht) => {
             if (bericht.type === 'subtaak-delegatie') {
                 faillissementenLezer.berichtAanWorker(bericht);
             }
         });
-        generiek_1.default.time(5000).then(() => {
+        generiek_1.default.time(30000).then(() => {
             // TODO als de scrapers stil zijn e.d. ??
-            // procesNuts.stop(statsWorker);
+            proces_1.default.stop(statsWorker);
         });
         // draai varia scrapers
         // try {

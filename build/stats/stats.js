@@ -2,6 +2,7 @@
  * @file Worker. Houdt bij, per oorsprong, wat voor data actueel is gelogd. Schrijft naar public/index.html de 'luxe console'. Zijn kaartjes met data.
  * TOEKOMST TODO 'console-rol' soort ticker maken en scheiden van 'data overzicht'.
  * TODO: naar secundaire workers. (??)
+ * TODO DIT IS ECHT EEN ZOOITJE. Maak apart een lijst met workers, een lijst met logs, een lijst met data.
  */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -12,126 +13,71 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "worker_threads", "fs", "open"], factory);
+        define(["require", "exports", "worker_threads", "open", "../nuts/workers", "../nuts/generiek", "./stats-html"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const worker_threads_1 = require("worker_threads");
-    const fs_1 = __importDefault(require("fs"));
     const open_1 = __importDefault(require("open"));
-    /**
-     * Waarom is dit een worker? Ik had ruzie met typescript en had er ff geen zin in 😫 TODO class onzin weghalen.
-     */
-    class ConsoleData {
-        constructor() {
-            /**
-             * Of de console-pagina index.html geopend moet zijn en ververst moet worden
-             * of afgesloten.
-             */
-            this.streaming = true;
-            /**
-             * Dragers van de te debuggen / tabelleren data.
-             * TODO naam worker is onterecht, kan ook wat anders zijn.
-             */
-            this.workers = [
-            // {
-            //   naam: 'test',
-            //   data: {
-            //     ja: true
-            //   }
-            // }
-            ];
-            /**
-             * lijst met te verwerken logs.
-             */
-            this.logWerkLijst = [];
-        }
-        voegToeAanLogTakenLijst(nieuweDebug) {
-            this.logWerkLijst.push({
-                naam: nieuweDebug.naam,
-                log: nieuweDebug.log
+    const workers_1 = __importDefault(require("../nuts/workers"));
+    const generiek_1 = __importDefault(require("../nuts/generiek"));
+    const stats_html_1 = __importDefault(require("./stats-html"));
+    let statsWorkerMeta = {
+        status: 'uit',
+        fout: [],
+        streaming: true
+    };
+    const logData = [];
+    const tabelData = [];
+    const workersNamen = [];
+    const StatsIndexCSS = new generiek_1.default.BasisBestandOphaler('/../public/statWorker.css');
+    const StatIndexReloadJS = new generiek_1.default.BasisBestandOphaler('/../public/stat-js-reload.js');
+    const StatIndexAfsluitenJS = new generiek_1.default.BasisBestandOphaler('/../public/stat-js-reload.js');
+    const statHtmlReload = '';
+    const statHtmlAfsluiten = `
+  <div id='afsluit-html' class='afsluit-html'>
+    <h1>Deze pagina wordt afgesloten.</h1>
+    <p>Programma is klaar</p>
+    <button id='nietAfsluiten'>Niet afsluiten</button>
+  </div>
+`;
+    function verwerkNieuweDebug(bericht) {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
+        worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
+            type: 'console',
+            data: generiek_1.default.objectNaarTekst(bericht)
+        });
+        if ((_a = bericht.data) === null || _a === void 0 ? void 0 : _a.log) {
+            logData.push({
+                naam: (_c = (_b = bericht.data) === null || _b === void 0 ? void 0 : _b.naam) !== null && _c !== void 0 ? _c : 'onbekend',
+                log: (_d = bericht.data) === null || _d === void 0 ? void 0 : _d.log
             });
         }
-        get logLiHTML() {
-            return this.logWerkLijst
-                .map((logStuk) => {
-                return `<li class='log-stuk'>${logStuk.log.padEnd(35)} ${logStuk.naam}</li>`;
-            })
-                .join('');
-        }
-        /**
-         * Indien debugobject bestaat in this.workers, vernieuw en of vul aan. Zo nee, maak aan. Schrijf HTML.
-         * TODO geen zuivere functie.
-         * @param nieuweDebug
-         */
-        voegToeAanWorkers(nieuweDebug) {
-            const index = this.workers.findIndex((worker) => worker.naam === nieuweDebug.naam);
-            if (index !== -1) {
-                this.workers[index].data = Object.assign(this.workers[index].data, nieuweDebug.tabel);
-            }
-            else {
-                this.workers.push({
-                    naam: nieuweDebug.naam,
-                    data: nieuweDebug.tabel
+        if ((_e = bericht.data) === null || _e === void 0 ? void 0 : _e.tabel) {
+            const wn = (_g = (_f = bericht.data) === null || _f === void 0 ? void 0 : _f.naam) !== null && _g !== void 0 ? _g : 'geen-naam';
+            const eerdereTabelData = (_h = tabelData.find((td) => td.naam === wn)) !== null && _h !== void 0 ? _h : false;
+            if (!eerdereTabelData) {
+                tabelData.push({
+                    naam: (_k = (_j = bericht.data) === null || _j === void 0 ? void 0 : _j.naam) !== null && _k !== void 0 ? _k : 'onbekend',
+                    tabel: (_l = bericht.data) === null || _l === void 0 ? void 0 : _l.tabel
                 });
             }
-            schrijfHTML();
-        }
-        /**
-         * Maak tabel met data per worker.
-         * TODO tabel is ontstaan uit verwarring. Maak fatsoenlijke kaarten
-         * TODO sommige data zal niet converteerbaar zijn naar string. Zet die in een JSON object en maak die op
-         */
-        get workerDataTabel() {
-            const namen = `
-      <thead>
-        ${this.workers.map((w) => `<th>${w.naam}</th>`).join('')}
-      </thead>`;
-            const workersTd = this.workers
-                .map((w) => {
-                return `
-        <td>
-          ${this.objectNaarTekst(w.data)}
-        </td>
-          `;
-            })
-                .join('');
-            return `
-      <table>
-        ${namen}
-        <tr>${workersTd}</tr>
-      </table>
-    `;
-        }
-        /**
-         * helper van workerDataTabel
-         * klapt een object uit
-         * TODO gaat de fout in bij diep object.
-         * @param object
-         */
-        objectNaarTekst(object) {
-            const r = [];
-            for (let a in object) {
-                r.push(`${a}:  ${object[a]}`);
+            else {
+                Object.assign(eerdereTabelData, {
+                    tabel: (_m = bericht.data) === null || _m === void 0 ? void 0 : _m.tabel
+                });
             }
-            return r.join('<br>');
+        }
+        if (!workersNamen.includes((_p = (_o = bericht.data) === null || _o === void 0 ? void 0 : _o.naam) !== null && _p !== void 0 ? _p : 'onbekend')) {
+            workersNamen.push((_r = (_q = bericht.data) === null || _q === void 0 ? void 0 : _q.naam) !== null && _r !== void 0 ? _r : 'onbekend');
         }
     }
-    const consData = new ConsoleData();
     worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (bericht) => {
-        var _a, _b;
         switch (bericht.type) {
             case 'subtaak-delegatie':
-                if (bericht.data.log) {
-                    consData.voegToeAanLogTakenLijst({
-                        naam: (_a = bericht.data) === null || _a === void 0 ? void 0 : _a.naam,
-                        log: (_b = bericht.data) === null || _b === void 0 ? void 0 : _b.log
-                    });
-                }
-                if (bericht.data.tabel) {
-                    consData.voegToeAanWorkers(bericht.data);
-                }
+                verwerkNieuweDebug(bericht);
+                statHTMLWrap();
                 break;
             case 'start':
                 startStatWorker();
@@ -140,133 +86,42 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                 stopStatWorker();
                 break;
             default:
-                throw new Error('ongedefinieerd in swithc'); // TODO
+                statsWorkerMeta = workers_1.default.zetMetaData(statsWorkerMeta, {
+                    fout: [
+                        ...statsWorkerMeta.fout,
+                        new Error('ongedefinieerd in swithc')
+                    ]
+                }, true, false);
         }
     });
-    /**
-     * Haalt CSS op en cached t.
-     */
-    const statWorkerCSS = {
-        haalOp: function () {
-            if (fs_1.default.existsSync(__dirname + '/../../public/statWorker.css')) {
-                // TODO via config
-                return (this.b = fs_1.default.readFileSync(__dirname + '/../../public/statWorker.css', // TODO via config
-                {
-                    encoding: 'utf-8'
-                }));
-            }
-            else {
-                consData.voegToeAanWorkers({
-                    naam: 'statWorker',
-                    data: {
-                        log: 'stat worker css niet gevonden'
-                    }
-                });
-            }
-            return '';
-        },
-        b: '',
-        get bestand() {
-            if (!this.b) {
-                return this.haalOp();
-            }
-            else {
-                return this.b;
-            }
-        }
-    };
+    function statHTMLWrap() {
+        const s = statsWorkerMeta.streaming;
+        const JS = s ? StatIndexReloadJS.bestand : StatIndexAfsluitenJS.bestand;
+        const HTML = s ? statHtmlReload : statHtmlAfsluiten;
+        const CSS = true ? StatsIndexCSS.bestand : StatsIndexCSS.bestand;
+        return stats_html_1.default(logData, tabelData, workersNamen, CSS, JS, HTML).then((r) => {
+            worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({ type: 'console', data: 'html gebouwd' });
+            return r;
+        });
+    }
     async function startStatWorker() {
-        const CSS = await statWorkerCSS.bestand;
-        schrijfHTML().then(() => {
+        statHTMLWrap().then(() => {
             open_1.default('http://localhost:8080');
-            worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                type: 'console',
-                data: 'gestart'
-            });
+            workers_1.default.log('gestart');
         });
     }
     /**
      * sluit statpagina af, meld status aan controller.
      */
     function stopStatWorker() {
-        consData.streaming = false;
-        schrijfHTML().then(() => {
+        statsWorkerMeta.streaming = false;
+        statHTMLWrap().then(() => {
             setTimeout(function () {
-                worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                    type: 'status',
-                    data: 'dood'
-                });
+                statsWorkerMeta = workers_1.default.zetMetaData(statsWorkerMeta, {
+                    status: 'dood'
+                }, true, false);
                 process.exit();
             }, 2500); // vanwege reload tijd chrome.
         });
-    }
-    /**
-     * CLASSIC SLORDIGE SHIT. deal with it. Was heel ding met websockets aan het maken blablabla en en en en... fuck it. Smerig & effectief.
-     * draait HTML & JS uit in index.html afhankelijk van consData.streaming.
-     * of hij ververst, of hij sluit.
-     */
-    async function schrijfHTML() {
-        const css = statWorkerCSS.bestand;
-        const jsReload = `
-    const rt = 1000
-     
-    setTimeout(()=>{
-      location.reload()
-    }, rt)
-  `; // TODO naar bestand
-        const jsAfsluiten = `
-    const rt = 5000;
-    let afsluitenGaatDoor = true;
-     
-    const na = document.getElementById('nietAfsluiten');
-    const ahtml = document.getElementById('afsluit-html');
-    na.addEventListener('click', ()=>{
-        afsluitenGaatDoor = false;
-        ahtml.parentNode.removeChild(ahtml)  
-      })
-    setTimeout(()=>{
-      if (afsluitenGaatDoor) {
-        close();
-      }
-    }, rt)
-  `; // TODO naar bestand
-        const htmlReload = '';
-        const htmlAfsluiten = `
-    <div id='afsluit-html' class='afsluit-html'>
-      <h1>Deze pagina wordt afgesloten.</h1>
-      <p>Programma is klaar</p>
-      <button id='nietAfsluiten'>Niet afsluiten</button>
-    </div>
-  `;
-        const jsBlob = consData.streaming ? jsReload : jsAfsluiten;
-        const htmlBlob = consData.streaming ? htmlReload : htmlAfsluiten;
-        fs_1.default.writeFileSync(__dirname + '/../../public/index.html', // TODO via config
-        `
-  <!DOCTYPE html>
-  <body>
-    <head>
-      <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css'>
-      <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"> 
-      <style>
-        ${css}
-      </style>
-    </head>
-    <html>
-    ${JSON.stringify(consData.workers)}<br>
-    ${JSON.stringify(consData.logWerkLijst)}<br>
-    <ul class='kraak-log'>
-      ${consData.logLiHTML}
-    </ul>
-        <div class='kraak-stats'>
-          ${htmlBlob}
-          ${consData.workerDataTabel}
-        </div>
-      <script>
-        ${jsBlob}
-       </script>      
-</html>
-  </body>
-  `);
-        return true;
     }
 });

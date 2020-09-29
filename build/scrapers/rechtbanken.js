@@ -29,7 +29,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "worker_threads", "fs", "../config", "axios"], factory);
+        define(["require", "exports", "worker_threads", "fs", "../config", "axios", "../nuts/workers"], factory);
     }
 })(function (require, exports) {
     "use strict";
@@ -41,22 +41,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     const fs = __importStar(require("fs"));
     const config_1 = require("../config");
     const axios_1 = __importDefault(require("axios"));
-    // TODO eruit halen en vervangen door statworker.
-    const rbScrapeConfig = {
-        consoleOpKlaar: true,
-        consoleOpScrapeBestandSucces: true
+    const workers_1 = __importDefault(require("../nuts/workers")); // TODO via config
+    /**
+     * houder van metadata, wordt heen en terug gegeven door workersNuts.zetMetaData
+     */
+    let rechtbankMeta = {
+        status: 'uit',
+        fout: []
     };
     worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (bericht) => {
         if (bericht.type === 'start') {
-            worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                type: 'status',
-                data: {
-                    log: `HE STATSWORKER! ik ben begonnen.`
-                }
+            rechtbankMeta = workers_1.default.zetMetaData(rechtbankMeta, {
+                status: 'gestart'
             });
             initScraper();
         }
         if (bericht.type === 'stop') {
+            rechtbankMeta = workers_1.default.zetMetaData(rechtbankMeta, {
+                status: 'gestopt'
+            });
             process.exit();
         }
     });
@@ -66,31 +69,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     function initScraper() {
         const dagenTeScrapen = lijstDagenTeScrapen();
         scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {
-            if (scrapeExitBoodschap === true && rbScrapeConfig.consoleOpKlaar) {
-                // TODO naar statworker
-                worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                    type: 'status',
-                    data: {
-                        log: `Rechtbanken scraper klaar.`
-                    }
-                });
-                worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                    type: 'status',
-                    data: {
-                        tabel: {
-                            rbStatus: 'klaar'
-                        }
-                    }
+            if (scrapeExitBoodschap === true) {
+                rechtbankMeta = workers_1.default.zetMetaData(rechtbankMeta, {
+                    status: 'gestopt'
                 });
                 process.exit();
             }
             else {
-                // TODO naar statworker
-                worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                    type: 'status',
-                    data: {
-                        log: `Problemen bij de Rechtbanken scraper.`
-                    }
+                rechtbankMeta = workers_1.default.zetMetaData(rechtbankMeta, {
+                    status: 'fout',
+                    fout: new Error('onbekende fout in rechtbank na scrapen')
                 });
             }
         });
@@ -103,7 +91,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
      */
     function lijstDagenTeScrapen() {
         const rechtbankScraperRes = fs.readdirSync(`${config_1.config.pad.scrapeRes}/rechtbank`);
-        const laatsteScrape = rechtbankScraperRes[rechtbankScraperRes.length - 1]; // @TODO slap
+        const laatsteScrape = rechtbankScraperRes[rechtbankScraperRes.length - 1];
         const dagenTeScrapen = [];
         let datumMax = new Date(); // TODO vervangen met ref naar nuts datumlijst
         datumMax.setDate(datumMax.getDate() - 1); // vandaag niet scrapen, staat mss nog niet online.
@@ -128,26 +116,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         try {
             do {
                 const scrapeAns = await scrapeDatum(scrapeDag);
-                if (rbScrapeConfig.consoleOpScrapeBestandSucces) {
-                    worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                        type: 'status',
-                        data: {
-                            log: `scrapede route ${scrapeAns.route} - was ${scrapeAns.type}`
-                        }
-                    });
-                }
+                workers_1.default.log(`scrapede route ${scrapeAns.route} - was ${scrapeAns.type}`);
                 if (scrapeAns.type === 'gevuld') {
-                    worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                        type: 'subtaak-delegatie',
-                        data: scrapeAns.json
-                    });
+                    workers_1.default.subtaakDelegatie(scrapeAns.json);
                 }
                 scrapeDag = dagenTeScrapen.shift();
             } while (scrapeDag);
         }
         catch (error) {
-            console.log(error); // TODO AARRGHHH lege catch
-            // TODO naar generieke worker catch functie die statworker aanstuurt via controller.
+            throw new Error(error);
         }
         return true;
     }

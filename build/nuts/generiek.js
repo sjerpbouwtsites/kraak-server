@@ -1,17 +1,43 @@
-/**
- * @file Die nutsfuncties die generiek toe te passen zijn.
- */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 (function (factory) {
     if (typeof module === "object" && typeof module.exports === "object") {
         var v = factory(require, exports);
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports"], factory);
+        define(["require", "exports", "fs"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const fs_1 = __importDefault(require("fs"));
+    /**
+     * @file Die nutsfuncties die generiek toe te passen zijn.
+     */
+    class BasisBestandOphaler {
+        constructor(pad) {
+            this.pad = pad;
+        }
+        haalOp() {
+            var _a, _b;
+            try {
+                return (this.cache = fs_1.default.readFileSync(__dirname + this.pad, // TODO via config
+                {
+                    encoding: 'utf-8'
+                }));
+            }
+            catch (err) {
+                const s = (_b = (_a = this.pad) === null || _a === void 0 ? void 0 : _a.split('/')) !== null && _b !== void 0 ? _b : 'bestandspad/raadsel.wtf';
+                const soortVanNaam = s[s.length - 1].replace('.', ' ');
+                throw (((err.message = `${soortVanNaam} ongevonden.\n${err.message}`), err));
+            }
+        }
+        get bestand() {
+            return this.cache || this.haalOp();
+        }
+    }
     exports.default = {
         /**
          * promise achtige vertrager. syntax als
@@ -54,6 +80,7 @@
                 datumRef.setDate(datumRef.getDate() + 1);
             } while (datumRef < totDatum);
             return r;
-        }
+        },
+        BasisBestandOphaler
     };
 });

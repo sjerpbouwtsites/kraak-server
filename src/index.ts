@@ -12,9 +12,9 @@ import preRunScripts from './pre-run.js';
 // start http server met statWorker resultaat.
 startStatsServer();
 
-const statsWorker = new KraakWorker('./build/stats/stats.js').berichtAanWorker({
-  type: 'start'
-});
+const statsWorker = new KraakWorker('./build/stats/stats.js');
+statsWorker.koppelStatsWorker();
+statsWorker.berichtAanWorker({ type: 'start' });
 
 // gebruikt tijdens dev... om fs te bewerken
 try {
@@ -37,6 +37,7 @@ async function init() {
   const faillissementenLezer = new KraakWorker(
     './build/secundair/faillezer.js'
   );
+  faillissementenLezer.koppelStatsWorker(statsWorker);
   rechtbankScraper.berichtAanWorker({ type: 'start' });
   rechtbankScraper.on('message', (bericht: KraakBerichtVanWorker) => {
     if (bericht.type === 'subtaak-delegatie') {
@@ -44,9 +45,9 @@ async function init() {
     }
   });
 
-  nuts.time(5000).then(() => {
+  nuts.time(30000).then(() => {
     // TODO als de scrapers stil zijn e.d. ??
-    // procesNuts.stop(statsWorker);
+    procesNuts.stop(statsWorker);
   });
 
   // draai varia scrapers

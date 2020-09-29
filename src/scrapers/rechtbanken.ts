@@ -11,25 +11,27 @@ import * as fs from 'fs';
 import { config } from '../config';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { KraakBerichtAanWorker } from '../kraak-worker';
+import workersNuts, { workerMetaData } from '../nuts/workers'; // TODO via config
 
-// TODO eruit halen en vervangen door statworker.
-const rbScrapeConfig = {
-  consoleOpKlaar: true,
-  consoleOpScrapeBestandSucces: true
+/**
+ * houder van metadata, wordt heen en terug gegeven door workersNuts.zetMetaData
+ */
+let rechtbankMeta: workerMetaData = {
+  status: 'uit',
+  fout: []
 };
 
 parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
   if (bericht.type === 'start') {
-    parentPort?.postMessage({
-      type: 'status',
-      data: {
-        log: `HE STATSWORKER! ik ben begonnen.`
-      }
+    rechtbankMeta = workersNuts.zetMetaData(rechtbankMeta, {
+      status: 'gestart'
     });
-
     initScraper();
   }
   if (bericht.type === 'stop') {
+    rechtbankMeta = workersNuts.zetMetaData(rechtbankMeta, {
+      status: 'gestopt'
+    });
     process.exit();
   }
 });
@@ -40,30 +42,15 @@ parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
 function initScraper() {
   const dagenTeScrapen = lijstDagenTeScrapen();
   scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {
-    if (scrapeExitBoodschap === true && rbScrapeConfig.consoleOpKlaar) {
-      // TODO naar statworker
-      parentPort?.postMessage({
-        type: 'status',
-        data: {
-          log: `Rechtbanken scraper klaar.`
-        }
-      });
-      parentPort?.postMessage({
-        type: 'status',
-        data: {
-          tabel: {
-            rbStatus: 'klaar'
-          }
-        }
+    if (scrapeExitBoodschap === true) {
+      rechtbankMeta = workersNuts.zetMetaData(rechtbankMeta, {
+        status: 'gestopt'
       });
       process.exit();
     } else {
-      // TODO naar statworker
-      parentPort?.postMessage({
-        type: 'status',
-        data: {
-          log: `Problemen bij de Rechtbanken scraper.`
-        }
+      rechtbankMeta = workersNuts.zetMetaData(rechtbankMeta, {
+        status: 'fout',
+        fout: new Error('onbekende fout in rechtbank na scrapen')
       });
     }
   });
@@ -80,7 +67,7 @@ function lijstDagenTeScrapen(): string[] {
     `${config.pad.scrapeRes}/rechtbank`
   );
 
-  const laatsteScrape = rechtbankScraperRes[rechtbankScraperRes.length - 1]; // @TODO slap
+  const laatsteScrape = rechtbankScraperRes[rechtbankScraperRes.length - 1];
 
   const dagenTeScrapen: string[] = [];
 
@@ -110,25 +97,16 @@ async function scrapeData(dagenTeScrapen: string[]) {
   try {
     do {
       const scrapeAns = await scrapeDatum(scrapeDag);
-      if (rbScrapeConfig.consoleOpScrapeBestandSucces) {
-        parentPort?.postMessage({
-          type: 'status',
-          data: {
-            log: `scrapede route ${scrapeAns.route} - was ${scrapeAns.type}`
-          }
-        });
-      }
+      workersNuts.log(
+        `scrapede route ${scrapeAns.route} - was ${scrapeAns.type}`
+      );
       if (scrapeAns.type === 'gevuld') {
-        parentPort?.postMessage({
-          type: 'subtaak-delegatie',
-          data: scrapeAns.json
-        });
+        workersNuts.subtaakDelegatie(scrapeAns.json);
       }
       scrapeDag = dagenTeScrapen.shift();
     } while (scrapeDag);
   } catch (error) {
-    console.log(error); // TODO AARRGHHH lege catch
-    // TODO naar generieke worker catch functie die statworker aanstuurt via controller.
+    throw new Error(error);
   }
   return true;
 }

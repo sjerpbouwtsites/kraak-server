@@ -4,6 +4,7 @@
  */
 
 import { KraakBerichtVanWorker, KraakWorker } from '../kraak-worker';
+import nuts from './generiek';
 
 export default {
   /**
@@ -16,10 +17,12 @@ export default {
     });
     statsWorker.on('message', function (bericht: KraakBerichtVanWorker) {
       if (bericht.type === 'status') {
-        if (bericht.data === 'dood') {
+        if (bericht?.data?.tabel?.status === 'dood') {
           process.exit();
         } else {
-          throw new Error('statsworker wilt niet dood??' + bericht.data);
+          setTimeout(() => {
+            throw (new Error('DUURT LANG afsluiten wtf'), process.exit());
+          }, 2000);
         }
       }
     });

@@ -6,11 +6,8 @@
   "scripts": {
     "alleen-pre-run": "tsc; node build/pre-run.js",
     "alleen-eenmalig": "tsc; node build/eenmalig.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "draai": "npm run build; node build/index.js;",
-    "lint": "eslint . --ext .ts",
-    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "build": "tsc; node build/build-postfix.js",
+    "draai": "tsc; node build/build-postfix.js; node build/index.js;",
     "watch": "npm-watch"
   },
   "keywords": [],

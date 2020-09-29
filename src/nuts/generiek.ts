@@ -1,6 +1,37 @@
+import fs from 'fs';
+
 /**
  * @file Die nutsfuncties die generiek toe te passen zijn.
  */
+
+class BasisBestandOphaler {
+  private pad: string | undefined;
+  private cache: string | undefined;
+
+  constructor(pad: string) {
+    this.pad = pad;
+  }
+  public haalOp() {
+    try {
+      return (this.cache = fs.readFileSync(
+        __dirname + this.pad, // TODO via config
+        {
+          encoding: 'utf-8'
+        }
+      ));
+    } catch (err) {
+      const s = this.pad?.split('/') ?? 'bestandspad/raadsel.wtf';
+      const soortVanNaam = s[s.length - 1].replace('.', ' ');
+      throw (
+        ((err.message = `${soortVanNaam} ongevonden.\n${err.message}`), err)
+      );
+    }
+  }
+
+  get bestand(): string {
+    return this.cache || this.haalOp();
+  }
+}
 
 export default {
   /**
@@ -48,5 +79,6 @@ export default {
       datumRef.setDate(datumRef.getDate() + 1);
     } while (datumRef < totDatum);
     return r;
-  }
+  },
+  BasisBestandOphaler
 };

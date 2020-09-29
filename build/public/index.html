@@ -1,0 +1,111 @@
+
+  <!DOCTYPE html>
+  <body>
+    <head>
+      <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css'>
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"> 
+      <style>
+      
+      .bg-kleur--0 {
+        background-color: #8CB3B0
+      }
+      .letter-kleur--0 {
+        color: #8CB3B0
+      }      
+    
+      .bg-kleur--1 {
+        background-color: #085C67
+      }
+      .letter-kleur--1 {
+        color: #085C67
+      }      
+    
+      /* 
+  Ik kreeg niet zo snel uitgevogeld hoe die server te configureren een bepaalde map te server. Dus dit bestand wordt uitgelezen en in de HTML gekwakt in stats.ts 🖤
+*/
+
+* {
+  font-family: 'Roboto', sans-serif;
+}
+th,
+td {
+  padding: 10px;
+  text-align: center;
+}
+th {
+  background-color: black;
+  color: white;
+  font-variant: small-caps;
+}
+td {
+  background-color: white;
+}
+body {
+  background-color: #f2f2f2;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.log-stuk {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 2px;
+  list-style-type: none;
+}
+
+      </style>
+    </head>
+    <html>
+    <ul class='kraak-log'>
+      <li class='log-stuk bg-kleur--0'>
+          <span class='log-links'>gestart                            </span>
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg-kleur--1'>
+          <span class='log-links'>status gestart                     </span>
+          <span class='log-rechts'>rechtbanken</span>
+        </li><li class='log-stuk bg-kleur--1'>
+          <span class='log-links'>scrapede route 20200929000000 - was leeg</span>
+          <span class='log-rechts'>rechtbanken</span>
+        </li><li class='log-stuk bg-kleur--1'>
+          <span class='log-links'>status gestopt                     </span>
+          <span class='log-rechts'>rechtbanken</span>
+        </li>
+    </ul>
+        <div class='kraak-stats'>
+        <div class='kraak-kaarten'>
+    
+          <div class='kraak-kaart bg-kleur--1'>
+            <header class='kraak-kaart-header'>
+              <h2 class='kraak-kaart-kop'>rechtbanken</h2>
+              <div class='kraak-kaart-brood'>
+                status:  - gestopt
+fout:  - 
+              </div>
+          </div>
+        
+  </div>
+        </div>
+        <footer class='kraak-footer'>spatie om te stoppen.</footer>
+      <script>
+        "use strict";
+// @ts-ignore
+let rt = 1000;
+let reloadOk = true;
+setTimeout(() => {
+    // @ts-ignore
+    reloadOk && location.reload();
+}, rt);
+// @ts-ignore
+document === null || document === void 0 ? void 0 : document.getElementsByTagName('body')[0].addEventListener('keydown', (e) => {
+    if (e.code.toLowerCase() === 'space') {
+        reloadOk = false;
+    }
+});
+
+       </script>      
+</html>
+  </body>
+  

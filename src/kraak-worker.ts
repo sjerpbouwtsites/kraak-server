@@ -1,4 +1,5 @@
 import { Worker } from 'worker_threads';
+import { parentPort } from 'worker_threads';
 import nuts from './nuts/generiek';
 /**
  * Leeft in de master thread context.
@@ -26,8 +27,20 @@ export class KraakWorker extends Worker {
     return this;
   }
 
-  koppelStatsWorker(statsWorker: KraakWorker) {
-    this.statsWorker = statsWorker;
+  /**
+   * Iedere worker moet een referentie hebben naar de statsworker om te kunnen rapporteren en loggen.
+   * @param statsWorker
+   */
+  koppelStatsWorker(statsWorker: KraakWorker | null = null) {
+    if (!statsWorker && this.workerNaam === 'stats') {
+      this.statsWorker = this;
+    } else if (!statsWorker && this.workerNaam !== 'stats') {
+      throw new Error(
+        'je probeert een niets statsworker te koppelen aan zichtzelf in koppel stats worker'
+      );
+    } else if (statsWorker) {
+      this.statsWorker = statsWorker;
+    }
   }
 
   /**
@@ -47,12 +60,19 @@ export class KraakWorker extends Worker {
           return;
         }
 
+        if (!bericht?.data.tabel && !bericht?.data.log) {
+          parentPort?.postMessage({
+            type: 'console',
+            data: `${this.workerNaam} statusUpdate object niet goed gevormd.`
+          });
+        }
+
         const debugBericht: KraakDebugBericht = {
           type: 'subtaak-delegatie',
           data: {
             log: bericht?.data?.log,
-            naam: this.workerNaam || 'onbekend',
-            tabel: bericht.data.tabel
+            naam: bericht?.data?.naam || this.workerNaam || 'onbekend',
+            tabel: bericht?.data?.tabel
           }
         };
 
@@ -76,16 +96,6 @@ export class KraakWorker extends Worker {
   }
 }
 
-// export function workerOpExit(self: any) {
-//   self.on('exit', () => {
-//     parentPort?.postMessage({
-//       workerNaam: 'FIX ME LATER', //TODO
-//       type: 'console',
-//       data: `worker op ??? gestopt`
-//     });
-//   });
-//}
-
 export interface KraakBerichtVanWorker {
   workerNaam?: string | null;
   data?: any;
@@ -105,9 +115,11 @@ export interface KraakBerichtAanWorker {
  */
 export interface KraakDebugBericht extends KraakBerichtAanWorker {
   type: 'subtaak-delegatie';
-  data: {
-    naam?: string;
-    log?: string;
-    tabel?: object;
-  };
+  data: KraakDebugData;
+}
+
+export interface KraakDebugData {
+  naam?: string;
+  log?: string;
+  tabel?: object;
 }

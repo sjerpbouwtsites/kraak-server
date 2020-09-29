@@ -1,0 +1,164 @@
+
+  <!DOCTYPE html>
+  <body>
+    <head>
+      <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css'>
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"> 
+      <style>
+      
+      .bg--rechtbanken {
+        background-color: #8CB3B0
+      }
+      .letter--rechtbanken {
+        color: #8CB3B0
+      }    
+    
+      /* 
+  Ik kreeg niet zo snel uitgevogeld hoe die server te configureren een bepaalde map te server. Dus dit bestand wordt uitgelezen en in de HTML gekwakt in stats.ts 🖤
+*/
+
+* {
+  font-family: 'Roboto', sans-serif;
+}
+th,
+td {
+  padding: 10px;
+  text-align: center;
+}
+th {
+  background-color: black;
+  color: white;
+  font-variant: small-caps;
+}
+td {
+  background-color: white;
+}
+body {
+  background-color: #f2f2f2;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.log-stuk {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 2px;
+  list-style-type: none;
+}
+
+      </style>
+    </head>
+    <html>
+    <ul class='kraak-log'>
+      <li class='log-stuk bg--stats'>
+          <span class='log-links'>0                                  </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>gestart                            </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--rechtbanken'>
+          <span class='log-links'>status gestart                     </span> 
+          <span class='log-rechts'>rechtbanken</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>1                                  </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>hallo                              </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>#8CB3B0                            </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>
+      .bg--rechtbanken {
+        background-color: #8CB3B0
+      }
+      .letter--rechtbanken {
+        color: #8CB3B0
+      }    
+    </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--rechtbanken'>
+          <span class='log-links'>scrapede route 20200926000000 - was leeg</span> 
+          <span class='log-rechts'>rechtbanken</span>
+        </li><li class='log-stuk bg--rechtbanken'>
+          <span class='log-links'>scrapede route 20200927000000 - was leeg</span> 
+          <span class='log-rechts'>rechtbanken</span>
+        </li><li class='log-stuk bg--rechtbanken'>
+          <span class='log-links'>status gestopt                     </span> 
+          <span class='log-rechts'>rechtbanken</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>1                                  </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>hallo                              </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>#8CB3B0                            </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>
+      .bg--rechtbanken {
+        background-color: #8CB3B0
+      }
+      .letter--rechtbanken {
+        color: #8CB3B0
+      }    
+    </span> 
+          <span class='log-rechts'>stats</span>
+        </li>
+    </ul>
+        <div class='kraak-stats'>
+          
+    <div id='afsluit-html' class='afsluit-html'>
+      <h1>Deze pagina wordt afgesloten.</h1>
+      <p>Programma is klaar</p>
+      <button id='nietAfsluiten'>Niet afsluiten</button>
+    </div>
+  
+          
+      <table>
+        
+      <thead>
+        <th>rechtbanken</th>
+      </thead>
+        <tr>
+        <td>
+          status:  - gestopt
+fout:  - 
+        </td>
+          </tr>
+      </table>
+    
+        </div>
+        <footer class='kraak-footer'>spatie om te stoppen.</footer>
+      <script>
+        
+    const rt = 5000;
+    let afsluitenGaatDoor = true;
+     
+    const na = document.getElementById('nietAfsluiten');
+    const ahtml = document.getElementById('afsluit-html');
+    na.addEventListener('click', ()=>{
+        afsluitenGaatDoor = false;
+        ahtml.parentNode.removeChild(ahtml)  
+      })
+    document.getElementsByTagName('body')[0].addEventListener('keydown', (e) => {
+      if (e.code.toLowerCase() === 'space') {
+        afsluitenGaatDoor = false;
+      }
+    });
+
+    setTimeout(()=>{
+      if (afsluitenGaatDoor) {
+        close();
+      }
+    }, rt)
+  
+       </script>      
+</html>
+  </body>
+  

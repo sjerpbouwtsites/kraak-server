@@ -11,12 +11,36 @@ import {
   Publicatiecluster,
   publicatieClusterOmschrijving
 } from '../scrapers/rechtbanken';
+import workersNuts, { workerMetaData } from '../nuts/workers';
+
+/**
+ * houder van metadata, wordt heen en terug gegeven door workersNuts.zetMetaData
+ */
+let faillezerMeta: workerMetaData = {
+  status: 'uit',
+  fout: []
+};
 
 parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
   if (bericht.type === 'start') {
-    //
+    faillezerMeta = workersNuts.zetMetaData(
+      faillezerMeta,
+      {
+        status: 'gestart'
+      },
+      true,
+      false
+    );
   }
   if (bericht.type === 'stop') {
+    faillezerMeta = workersNuts.zetMetaData(
+      faillezerMeta,
+      {
+        status: 'gestart'
+      },
+      true,
+      false
+    );
     process.exit();
   }
   if (bericht.type === 'subtaak-delegatie' && !!bericht.data) {
@@ -28,10 +52,6 @@ parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
     parentPort?.postMessage(berichtTerug);
   }
 });
-
-function startFailLezer() {
-  console.log('start fail lezer');
-}
 
 /**
  * Krijgt via postMessage inhoud van scrape binnen
@@ -69,8 +89,17 @@ function verwerkFaillissementScrape(failScrapeData: RechtbankJSON) {
       } else if (
         !ontoegestaneClusters.includes(pc.PublicatieclusterOmschrijving)
       ) {
-        throw new Error(
+        const err = new Error(
           `${pc.PublicatieclusterOmschrijving} niet gevonden in toegestane of ontoegestane clusters`
+        );
+        faillezerMeta = workersNuts.zetMetaData(
+          faillezerMeta,
+          {
+            status: 'fout',
+            fout: [...faillezerMeta.fout, err]
+          },
+          true,
+          false
         );
       }
     });
@@ -85,27 +114,33 @@ function verwerkPublicatieCluster(
 ) {
   const publicatieTeksten: TijdelijkPublicatie[] = [];
 
-  publicatieCluster.Publicatiesoorten.forEach((pubSoort) => {
-    //pubsoort is array met bijna altijd één object met keys: publicatiesoortCaption, PublicatiesNaarLocatie
-    pubSoort.PublicatiesNaarLocatie.forEach((pubNaarLoc) => {
-      // hierin zitten de daadwerkelijke publicaties.
-      pubNaarLoc.Publicaties.forEach((publicatieTekst: string) => {
-        // nu nog de niet-bedrijven eruit halen.
-        if (
-          publicatieTekst.includes('kvk') ||
-          publicatieTekst.includes('KvK') ||
-          publicatieTekst.includes('KVK')
-        ) {
-          publicatieTeksten.push({
-            inhoud: publicatieTekst,
-            type: publicatieCluster.PublicatieclusterOmschrijving,
-            datum: publicatieCluster.datum
-          });
-        }
+  try {
+    publicatieCluster.Publicatiesoorten.forEach((pubSoort) => {
+      //pubsoort is array met bijna altijd één object met keys: publicatiesoortCaption, PublicatiesNaarLocatie
+      pubSoort.PublicatiesNaarLocatie.forEach((pubNaarLoc) => {
+        // hierin zitten de daadwerkelijke publicaties.
+        pubNaarLoc.Publicaties.forEach((publicatieTekst: string) => {
+          // nu nog de niet-bedrijven eruit halen.
+          if (
+            publicatieTekst.includes('kvk') ||
+            publicatieTekst.includes('KvK') ||
+            publicatieTekst.includes('KVK')
+          ) {
+            publicatieTeksten.push({
+              inhoud: publicatieTekst,
+              type: publicatieCluster.PublicatieclusterOmschrijving,
+              datum: publicatieCluster.datum
+            });
+          }
+        });
       });
     });
-  });
-
+  } catch (clusterfuck) {
+    workersNuts.log('fout bij doorzoeken publicatieClusters');
+    faillezerMeta = workersNuts.zetMetaData(faillezerMeta, {
+      fout: [...faillezerMeta.fout, clusterfuck]
+    });
+  }
   // HIER PUBLICATIETEKSTEN IN DB SCHUIVEN
 
   // HIER ADRESSEN OPHALEN EN NIEUWE VERGELIJKEN.
