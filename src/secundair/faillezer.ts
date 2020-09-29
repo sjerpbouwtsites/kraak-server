@@ -4,7 +4,7 @@
  */
 
 import { parentPort } from 'worker_threads';
-import { config } from '../config';
+import config from '../config';
 import { KraakBerichtAanWorker, KraakBerichtVanWorker } from '../kraak-worker';
 import {
   RechtbankJSON,

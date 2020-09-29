@@ -1,7 +1,6 @@
 import { resolve } from 'path';
 
-export const config: Config = {
-  // TODO naar default
+const config: Config = {
   pad: {
     db: resolve(`${__dirname}/../db`), // buiten build folder
     nuts: resolve(`${__dirname}/nuts`),
@@ -33,6 +32,8 @@ export const config: Config = {
     ]
   }
 };
+
+export default config;
 
 export interface Config {
   pad: {

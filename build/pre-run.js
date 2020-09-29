@@ -22,6 +22,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 (function (factory) {
     if (typeof module === "object" && typeof module.exports === "object") {
         var v = factory(require, exports);
@@ -34,7 +37,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const fs = __importStar(require("fs"));
-    const config_1 = require("./config");
+    const config_1 = __importDefault(require("./config"));
     /**
      * kan overschreven worden vanuit index.ts
      */
@@ -46,7 +49,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
      * 5 kunnen verwijderen
      */
     const verwijderLaatsteRechtbankScrapes = function (conf) {
-        const rbpad = `${config_1.config.pad.scrapeRes}/rechtbank`;
+        const rbpad = `${config_1.default.pad.scrapeRes}/rechtbank`;
         const { aantalRechtbankScrapesWeg } = conf || preRunConfig;
         const alleRechtbankScrapes = fs.readdirSync(rbpad);
         const errors = [];

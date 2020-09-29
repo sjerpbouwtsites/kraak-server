@@ -39,9 +39,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     // TODO implementeren: status opvragen ism. werk wachtrij
     const worker_threads_1 = require("worker_threads");
     const fs = __importStar(require("fs"));
-    const config_1 = require("../config");
+    const config_1 = __importDefault(require("../config"));
     const axios_1 = __importDefault(require("axios"));
-    const workers_1 = __importDefault(require("../nuts/workers")); // TODO via config
+    const workers_1 = __importDefault(require("../nuts/workers"));
     /**
      * houder van metadata, wordt heen en terug gegeven door workersNuts.zetMetaData
      */
@@ -90,7 +90,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
      * data als YYYY-MM-DD
      */
     function lijstDagenTeScrapen() {
-        const rechtbankScraperRes = fs.readdirSync(`${config_1.config.pad.scrapeRes}/rechtbank`);
+        const rechtbankScraperRes = fs.readdirSync(`${config_1.default.pad.scrapeRes}/rechtbank`);
         const laatsteScrape = rechtbankScraperRes[rechtbankScraperRes.length - 1];
         const dagenTeScrapen = [];
         let datumMax = new Date(); // TODO vervangen met ref naar nuts datumlijst
@@ -162,9 +162,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
      * Organisatie functie als de rechtbanken een goed gevormd antwoord geven ZONDER resultaat.
      */
     function scrapeResultaatLeeg(route, succesFunc) {
-        const rechtbankMeta = JSON.parse(fs.readFileSync(`${config_1.config.pad.scrapeRes}/meta/rechtbankmeta.json`, 'utf-8'));
+        const rechtbankMeta = JSON.parse(fs.readFileSync(`${config_1.default.pad.scrapeRes}/meta/rechtbankmeta.json`, 'utf-8'));
         rechtbankMeta.legeResponses.push(route);
-        fs.writeFileSync(`${config_1.config.pad.scrapeRes}/meta/rechtbankmeta.json`, JSON.stringify(rechtbankMeta));
+        fs.writeFileSync(`${config_1.default.pad.scrapeRes}/meta/rechtbankmeta.json`, JSON.stringify(rechtbankMeta));
         succesFunc({
             type: 'leeg',
             route: route
@@ -174,7 +174,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
      * Organisatie functie als de rechtbanken een goed gevormd antwoord geven MET resultaat.
      */
     async function scrapeResultaatGevuld(jsonBlob, route, succesFunc) {
-        const opslagPad = `${config_1.config.pad.scrapeRes}/rechtbank/${route}.json`;
+        const opslagPad = `${config_1.default.pad.scrapeRes}/rechtbank/${route}.json`;
         return fs.writeFile(opslagPad, JSON.stringify(jsonBlob), () => {
             succesFunc({
                 type: 'gevuld',

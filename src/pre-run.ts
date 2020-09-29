@@ -5,7 +5,7 @@
  */
 
 import * as fs from 'fs';
-import { config } from './config';
+import config from './config';
 
 /**
  * kan overschreven worden vanuit index.ts

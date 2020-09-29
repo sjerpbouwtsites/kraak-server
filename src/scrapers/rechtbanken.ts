@@ -8,10 +8,10 @@
 
 import { parentPort } from 'worker_threads';
 import * as fs from 'fs';
-import { config } from '../config';
+import config from '../config';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { KraakBerichtAanWorker } from '../kraak-worker';
-import workersNuts, { workerMetaData } from '../nuts/workers'; // TODO via config
+import workersNuts, { workerMetaData } from '../nuts/workers';
 
 /**
  * houder van metadata, wordt heen en terug gegeven door workersNuts.zetMetaData

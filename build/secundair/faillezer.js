@@ -17,7 +17,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const worker_threads_1 = require("worker_threads");
-    const config_1 = require("../config");
+    const config_1 = __importDefault(require("../config"));
     const workers_1 = __importDefault(require("../nuts/workers"));
     /**
      * houder van metadata, wordt heen en terug gegeven door workersNuts.zetMetaData
@@ -55,8 +55,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         // TODO beter typen
         var _a;
         const Instanties = failScrapeData.Instanties;
-        const toegestaneClusters = config_1.config.opties.toegestaneClusters;
-        const ontoegestaneClusters = config_1.config.opties.ontoegestaneClusters;
+        const toegestaneClusters = config_1.default.opties.toegestaneClusters;
+        const ontoegestaneClusters = config_1.default.opties.ontoegestaneClusters;
         /**
          * tbv. terugzoeken uitspraken.
          */

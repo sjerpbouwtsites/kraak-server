@@ -4,7 +4,7 @@
 
 import fs from 'fs';
 import nuts from './nuts/generiek';
-import { config } from './config';
+import config from './config';
 
 // /**
 //  * gedraaid bij migreren rechtbank scrape res json van v0 naar v1.
