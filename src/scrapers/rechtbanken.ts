@@ -2,13 +2,11 @@
  * @file Worker. Leest map scrape-res uit voor de laatste succesvolle rechtank scrape en haalt alle missende één voor één op. 'gevulde' scrape resultaten worden als bestand opgeslagen & via referentie aan de controller doorgegeven.
  */
 
-// TODO implementeren: werk wachtrij
-// TODO implementeren: status opvragen ism. werk wachtrij
-
 import { parentPort } from 'worker_threads';
 import * as fs from 'fs';
 import config from '../config';
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import nuts from '../nuts/generiek';
 import { KraakBerichtAanWorker } from '../kraak-worker';
 import workersNuts, { workerMetaData } from '../nuts/workers';
 
@@ -29,15 +27,12 @@ parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
     initScraper();
   }
   if (bericht.type === 'stop') {
-    rechtbankMeta = workersNuts.zetMetaData(rechtbankMeta, {
-      status: 'gestopt'
-    });
-    process.exit();
+    stopScaper();
   }
 });
 
 /**
- * initialisatiefunctie aangeroepen door message eventhandler.
+ * organisatie. initialisatiefunctie aangeroepen door message eventhandler.
  */
 function initScraper() {
   const dagenTeScrapen = lijstDagenTeScrapen();
@@ -56,6 +51,30 @@ function initScraper() {
     }
   });
 }
+/**
+ * organisatie. Als meta werkTeDoen niet leeg, log, creer fout, anders correc afgesloten process exit.
+ */
+function stopScaper() {
+  let werkFout: Error | null = null;
+  if (rechtbankMeta.werkTeDoen.length) {
+    workersNuts.log(
+      `ik heb nog werk te doen maar wordt gestopt! Nog ${rechtbankMeta.werkTeDoen.length} te gaan...`
+    );
+    werkFout = new Error(
+      'rechtbank gestopt maar werkTeDoen is nog' +
+        rechtbankMeta.werkTeDoen.length
+    );
+  }
+  rechtbankMeta = workersNuts.zetMetaData(rechtbankMeta, {
+    status: 'gestopt',
+    fout: werkFout ? [werkFout] : []
+  });
+  if (werkFout) {
+    throw werkFout;
+  } else {
+    process.exit();
+  }
+}
 
 /**
  * lees map scrape-res/rechtbank
@@ -69,28 +88,23 @@ function lijstDagenTeScrapen(): string[] {
   );
 
   const laatsteScrape = rechtbankScraperRes[rechtbankScraperRes.length - 1];
-
-  const dagenTeScrapen: string[] = [];
-
-  let datumMax = new Date(); // TODO vervangen met ref naar nuts datumlijst
-  datumMax.setDate(datumMax.getDate() - 1); // vandaag niet scrapen, staat mss nog niet online.
-
   let datumRef = routeNaarDatum(laatsteScrape);
-  datumRef.setDate(datumRef.getDate() + 1); // vanaf dag ná laatste scrape gaan kijken
-  // array met routes die we kunnen laten.
+  const datumMax = new Date();
+
   const { legeResponses } = JSON.parse(
     fs.readFileSync(`${config.pad.scrapeRes}/meta/rechtbankmeta.json`, 'utf-8')
   );
-  do {
-    const pushString = datumRef.toISOString().replace(/-/g, '').substring(0, 8); // maak YYYYMMDD
-    const pushStringRouteEq = pushString.padEnd(14, '0'); // om te vergelijken met rechtbankmetajson legeResponses.
-    if (!legeResponses.includes(pushStringRouteEq)) {
-      dagenTeScrapen.push(pushString);
-    }
-    datumRef.setDate(datumRef.getDate() + 1);
-  } while (datumRef < datumMax);
-
-  return dagenTeScrapen;
+  /**
+   * maakt Date[], dan YYYYMMJJ[], dan filter op eerdere lege responses.
+   */
+  return nuts
+    .datalijstTussen(datumRef, datumMax)
+    .map((datum: Date) => {
+      return datum.toISOString().replace(/-/g, '').substring(0, 8);
+    })
+    .filter((datumAchtigeString: string) => {
+      return !legeResponses.includes(datumAchtigeString.padEnd(14, '0'));
+    });
 }
 
 /**
@@ -136,10 +150,11 @@ function scrapeDatum(this: any, datum: string): Promise<scrapeDatumAns> {
       })
       .then((jsonBlob: RechtbankJSON) => {
         if (!instanceOfRechtbankJSON(jsonBlob)) {
-          // TODO debug die data ergens heen
-          throw new Error(
+          const err = new Error(
             'rechtbank JSON geen RechtbankJSON instance. antwoord in temp map'
           );
+          rechtbankMeta.fout.push(err);
+          throw err;
         }
 
         if (jsonBlob.Instanties.length === 0) {
@@ -149,7 +164,7 @@ function scrapeDatum(this: any, datum: string): Promise<scrapeDatumAns> {
         }
       })
       .catch((err: AxiosError) => {
-        scrapeDatumFaal(err); // TODO
+        scrapeDatumFaal(err);
       });
   });
 }

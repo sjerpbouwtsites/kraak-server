@@ -52,20 +52,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
      * Verwerkt tot adressen.
      */
     function verwerkFaillissementScrape(failScrapeData) {
-        // TODO beter typen
-        var _a;
         const Instanties = failScrapeData.Instanties;
-        const toegestaneClusters = config_1.default.opties.toegestaneClusters;
-        const ontoegestaneClusters = config_1.default.opties.ontoegestaneClusters;
+        const toegestaneClusters = config_1.default.toegestaneClusters;
+        const ontoegestaneClusters = config_1.default.ontoegestaneClusters;
         /**
          * tbv. terugzoeken uitspraken.
          */
-        // TODO dit is rommelig
-        const datumMatch = failScrapeData.Datum.match(/\d{13}/);
-        const datumTijdNummer = !!datumMatch
-            ? Number((_a = datumMatch[0]) !== null && _a !== void 0 ? _a : '1388024800000')
-            : 1388024800000;
-        const uitspraakDatum = new Date(datumTijdNummer).toISOString();
+        const uitspraakDatum = failScrapeDatumOpschoner(failScrapeData.Datum);
         /**
          * Uitspraken van die dag, per publicatiecluster.
          * Een publicatiecluster zijn x uitspraken, uit één stad, van één type publicatieClusterOmschrijving.
@@ -86,6 +79,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                 }
             });
         });
+    }
+    /**
+     * Als de rechtbank een werkbare datum opsloeg krijg je de ISOstring terug.
+     * Anders gok ik dat de uitspraakdatum vandaag was en krijg je die ISO.
+     * @param rechtbankDatum
+     * @returns datum als ISOstring
+     */
+    function failScrapeDatumOpschoner(rechtbankDatum) {
+        var _a;
+        const datumMatch = rechtbankDatum.match(/\d{13}/);
+        const vandaagTijd = new Date().getTime();
+        const datumTijdNummer = !!datumMatch
+            ? Number((_a = datumMatch[0]) !== null && _a !== void 0 ? _a : vandaagTijd)
+            : Number(vandaagTijd);
+        return new Date(datumTijdNummer).toISOString();
     }
     /**
      * Functie die daadwerkelijk de adressen eruit haalt.

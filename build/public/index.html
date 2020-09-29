@@ -6,19 +6,12 @@
       <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"> 
       <style>
       
-      .bg-kleur--0 {
+      .bg--rechtbanken {
         background-color: #8CB3B0
       }
-      .letter-kleur--0 {
+      .letter--rechtbanken {
         color: #8CB3B0
-      }      
-    
-      .bg-kleur--1 {
-        background-color: #085C67
-      }
-      .letter-kleur--1 {
-        color: #085C67
-      }      
+      }    
     
       /* 
   Ik kreeg niet zo snel uitgevogeld hoe die server te configureren een bepaalde map te server. Dus dit bestand wordt uitgelezen en in de HTML gekwakt in stats.ts 🖤
@@ -60,49 +53,111 @@ body {
     </head>
     <html>
     <ul class='kraak-log'>
-      <li class='log-stuk bg-kleur--0'>
-          <span class='log-links'>gestart                            </span>
+      <li class='log-stuk bg--stats'>
+          <span class='log-links'>0                                  </span> 
           <span class='log-rechts'>stats</span>
-        </li><li class='log-stuk bg-kleur--1'>
-          <span class='log-links'>status gestart                     </span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>gestart                            </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--rechtbanken'>
+          <span class='log-links'>status gestart                     </span> 
           <span class='log-rechts'>rechtbanken</span>
-        </li><li class='log-stuk bg-kleur--1'>
-          <span class='log-links'>status gestopt                     </span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>1                                  </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>hallo                              </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>#8CB3B0                            </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>
+      .bg--rechtbanken {
+        background-color: #8CB3B0
+      }
+      .letter--rechtbanken {
+        color: #8CB3B0
+      }    
+    </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--rechtbanken'>
+          <span class='log-links'>scrapede route 20200926000000 - was leeg</span> 
           <span class='log-rechts'>rechtbanken</span>
+        </li><li class='log-stuk bg--rechtbanken'>
+          <span class='log-links'>scrapede route 20200927000000 - was leeg</span> 
+          <span class='log-rechts'>rechtbanken</span>
+        </li><li class='log-stuk bg--rechtbanken'>
+          <span class='log-links'>status gestopt                     </span> 
+          <span class='log-rechts'>rechtbanken</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>1                                  </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>hallo                              </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>#8CB3B0                            </span> 
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg--stats'>
+          <span class='log-links'>
+      .bg--rechtbanken {
+        background-color: #8CB3B0
+      }
+      .letter--rechtbanken {
+        color: #8CB3B0
+      }    
+    </span> 
+          <span class='log-rechts'>stats</span>
         </li>
     </ul>
         <div class='kraak-stats'>
-        <div class='kraak-kaarten'>
-    
-          <div class='kraak-kaart bg-kleur--1'>
-            <header class='kraak-kaart-header'>
-              <h2 class='kraak-kaart-kop'>rechtbanken</h2>
-              <div class='kraak-kaart-brood'>
-                status:  - gestopt
-fout:  - 
-werkTeDoen:  - 
-              </div>
-          </div>
+          
+    <div id='afsluit-html' class='afsluit-html'>
+      <h1>Deze pagina wordt afgesloten.</h1>
+      <p>Programma is klaar</p>
+      <button id='nietAfsluiten'>Niet afsluiten</button>
+    </div>
+  
+          
+      <table>
         
-  </div>
+      <thead>
+        <th>rechtbanken</th>
+      </thead>
+        <tr>
+        <td>
+          status:  - gestopt
+fout:  - 
+        </td>
+          </tr>
+      </table>
+    
         </div>
         <footer class='kraak-footer'>spatie om te stoppen.</footer>
       <script>
-        "use strict";
-// @ts-ignore
-let rt = 1000;
-let reloadOk = true;
-setTimeout(() => {
-    // @ts-ignore
-    reloadOk && location.reload();
-}, rt);
-// @ts-ignore
-document === null || document === void 0 ? void 0 : document.getElementsByTagName('body')[0].addEventListener('keydown', (e) => {
-    if (e.code.toLowerCase() === 'space') {
-        reloadOk = false;
-    }
-});
+        
+    const rt = 5000;
+    let afsluitenGaatDoor = true;
+     
+    const na = document.getElementById('nietAfsluiten');
+    const ahtml = document.getElementById('afsluit-html');
+    na.addEventListener('click', ()=>{
+        afsluitenGaatDoor = false;
+        ahtml.parentNode.removeChild(ahtml)  
+      })
+    document.getElementsByTagName('body')[0].addEventListener('keydown', (e) => {
+      if (e.code.toLowerCase() === 'space') {
+        afsluitenGaatDoor = false;
+      }
+    });
 
+    setTimeout(()=>{
+      if (afsluitenGaatDoor) {
+        close();
+      }
+    }, rt)
+  
        </script>      
 </html>
   </body>

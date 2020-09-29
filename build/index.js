@@ -17,12 +17,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     const generiek_1 = __importDefault(require("./nuts/generiek"));
     const indexServer_1 = __importDefault(require("./stats/indexServer"));
     const pre_run_js_1 = __importDefault(require("./pre-run.js"));
-    // TODO wrapper maken van parentPort die het koppelt aan de controller om zo de berichten te kunnen typen
     // start http server met statWorker resultaat.
     indexServer_1.default();
     const statsWorker = new kraak_worker_1.KraakWorker('./build/stats/stats.js');
     statsWorker.koppelStatsWorker();
     statsWorker.berichtAanWorker({ type: 'start' });
+    statsWorker.console({ type: 'console', data: 'tekst' });
+    process.exit();
     // gebruikt tijdens dev... om fs te bewerken
     try {
         pre_run_js_1.default({ aantalRechtbankScrapesWeg: 0 });

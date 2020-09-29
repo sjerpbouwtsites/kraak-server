@@ -45,15 +45,24 @@
             }
         }
         /**
+         * LEGACY log methode... gehouden omdat de logger in
+         * de browser kapot kan gaan vanwege redenen
+         * deze
+         * @deprecated
+         * @param bericht KraakBerichtVanWorker
+         */
+        console(bericht) {
+            var _a;
+            console.log(`${bericht.data} ${(_a = this.workerNaam) === null || _a === void 0 ? void 0 : _a.padStart(25)}     `);
+        }
+        /**
          * als worker message naar master thread stuurt.
          */
         zetOnMessage() {
             this.on('message', (bericht) => {
-                var _a, _b, _c, _d, _e;
+                var _a, _b, _c, _d;
                 if (bericht.type === 'console') {
-                    // TODO legacy?
-                    console.log(`${bericht.data} ${(_a = this.workerNaam) === null || _a === void 0 ? void 0 : _a.padStart(25)} 
-        `);
+                    this.console(bericht);
                 }
                 if (bericht.type === 'status') {
                     if (!this.statsWorker) {
@@ -69,12 +78,12 @@
                     const debugBericht = {
                         type: 'subtaak-delegatie',
                         data: {
-                            log: (_b = bericht === null || bericht === void 0 ? void 0 : bericht.data) === null || _b === void 0 ? void 0 : _b.log,
-                            naam: ((_c = bericht === null || bericht === void 0 ? void 0 : bericht.data) === null || _c === void 0 ? void 0 : _c.naam) || this.workerNaam || 'onbekend',
-                            tabel: (_d = bericht === null || bericht === void 0 ? void 0 : bericht.data) === null || _d === void 0 ? void 0 : _d.tabel
+                            log: (_a = bericht === null || bericht === void 0 ? void 0 : bericht.data) === null || _a === void 0 ? void 0 : _a.log,
+                            naam: ((_b = bericht === null || bericht === void 0 ? void 0 : bericht.data) === null || _b === void 0 ? void 0 : _b.naam) || this.workerNaam || 'onbekend',
+                            tabel: (_c = bericht === null || bericht === void 0 ? void 0 : bericht.data) === null || _c === void 0 ? void 0 : _c.tabel
                         }
                     };
-                    (_e = this.statsWorker) === null || _e === void 0 ? void 0 : _e.berichtAanWorker(debugBericht);
+                    (_d = this.statsWorker) === null || _d === void 0 ? void 0 : _d.berichtAanWorker(debugBericht);
                 }
             });
             return this;

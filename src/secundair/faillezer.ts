@@ -58,21 +58,13 @@ parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
  * Verwerkt tot adressen.
  */
 function verwerkFaillissementScrape(failScrapeData: RechtbankJSON) {
-  // TODO beter typen
-
   const Instanties = failScrapeData.Instanties;
-  const toegestaneClusters = config.opties.toegestaneClusters;
-  const ontoegestaneClusters = config.opties.ontoegestaneClusters;
+  const toegestaneClusters = config.toegestaneClusters;
+  const ontoegestaneClusters = config.ontoegestaneClusters;
   /**
    * tbv. terugzoeken uitspraken.
    */
-
-  // TODO dit is rommelig
-  const datumMatch = failScrapeData.Datum.match(/\d{13}/);
-  const datumTijdNummer = !!datumMatch
-    ? Number(datumMatch[0] ?? '1388024800000')
-    : 1388024800000;
-  const uitspraakDatum = new Date(datumTijdNummer).toISOString();
+  const uitspraakDatum = failScrapeDatumOpschoner(failScrapeData.Datum);
 
   /**
    * Uitspraken van die dag, per publicatiecluster.
@@ -104,6 +96,21 @@ function verwerkFaillissementScrape(failScrapeData: RechtbankJSON) {
       }
     });
   });
+}
+
+/**
+ * Als de rechtbank een werkbare datum opsloeg krijg je de ISOstring terug.
+ * Anders gok ik dat de uitspraakdatum vandaag was en krijg je die ISO.
+ * @param rechtbankDatum
+ * @returns datum als ISOstring
+ */
+function failScrapeDatumOpschoner(rechtbankDatum: string): string {
+  const datumMatch = rechtbankDatum.match(/\d{13}/);
+  const vandaagTijd = new Date().getTime();
+  const datumTijdNummer = !!datumMatch
+    ? Number(datumMatch[0] ?? vandaagTijd)
+    : Number(vandaagTijd);
+  return new Date(datumTijdNummer).toISOString();
 }
 
 /**

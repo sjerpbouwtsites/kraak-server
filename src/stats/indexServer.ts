@@ -7,6 +7,7 @@
 import http from 'http';
 import fs from 'fs';
 import { parentPort } from 'worker_threads';
+import config from '../config';
 
 export default async function (): Promise<http.Server | Error> {
   try {
@@ -16,14 +17,12 @@ export default async function (): Promise<http.Server | Error> {
           type: 'console',
           data: 'maak server jo!'
         });
-
-        const indexPad = `${__dirname}/../public/index.html`;
-        const indexHTML = fs.readFileSync(indexPad); // TODO van nuts afhalen
+        const indexHTML = fs.readFileSync(`${config.pad.public}/index.html`);
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.write(indexHTML);
         res.end();
       })
-      .listen(8080); // TODO uit opties halen
+      .listen(config.server.publicPort);
   } catch (e) {
     return new Error(e);
   }

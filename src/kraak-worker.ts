@@ -44,14 +44,22 @@ export class KraakWorker extends Worker {
   }
 
   /**
+   * oude log methode... gehouden omdat de logger in
+   * de browser kapot kan gaan vanwege redenen
+   * deze is handig erbij
+   * @deprecated
+   */
+  console(bericht: KraakBerichtVanWorker) {
+    console.log(`${bericht.data} ${this.workerNaam?.padStart(25)}     `);
+  }
+
+  /**
    * als worker message naar master thread stuurt.
    */
   zetOnMessage(): KraakWorker {
     this.on('message', (bericht: KraakBerichtVanWorker) => {
       if (bericht.type === 'console') {
-        // TODO legacy?
-        console.log(`${bericht.data} ${this.workerNaam?.padStart(25)} 
-        `);
+        this.console(bericht);
       }
 
       if (bericht.type === 'status') {
@@ -99,7 +107,7 @@ export class KraakWorker extends Worker {
 export interface KraakBerichtVanWorker {
   workerNaam?: string | null;
   data?: any;
-  type: 'console' | 'console-lijst' | 'subtaak-delegatie' | 'status';
+  type: 'console' | 'subtaak-delegatie' | 'status';
 }
 
 export interface KraakBerichtAanWorker {

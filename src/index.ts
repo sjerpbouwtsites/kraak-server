@@ -7,8 +7,6 @@ import procesNuts from './nuts/proces';
 import nuts from './nuts/generiek';
 import startStatsServer from './stats/indexServer';
 import preRunScripts from './pre-run.js';
-// TODO wrapper maken van parentPort die het koppelt aan de controller om zo de berichten te kunnen typen
-
 // start http server met statWorker resultaat.
 startStatsServer();
 

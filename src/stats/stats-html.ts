@@ -1,6 +1,7 @@
 import { LogStuk, TabelStuk } from './stats';
 import fs from 'fs';
 import nuts from '../nuts/generiek';
+import config from '../config';
 
 const kleurenLijst = ['#8CB3B0', '#085C67', '#0E7479', '#163F5B'];
 
@@ -66,7 +67,7 @@ export default async function (
   HTML: string
 ): Promise<boolean> {
   fs.writeFileSync(
-    `${__dirname}/../public/index.html`, // TODO via config
+    `${config.pad.public}/index.html`,
     `
   <!DOCTYPE html>
   <body>

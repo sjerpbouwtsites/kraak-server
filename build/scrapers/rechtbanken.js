@@ -29,17 +29,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "worker_threads", "fs", "../config", "axios", "../nuts/workers"], factory);
+        define(["require", "exports", "worker_threads", "fs", "../config", "axios", "../nuts/generiek", "../nuts/workers"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    // TODO implementeren: werk wachtrij
-    // TODO implementeren: status opvragen ism. werk wachtrij
     const worker_threads_1 = require("worker_threads");
     const fs = __importStar(require("fs"));
     const config_1 = __importDefault(require("../config"));
     const axios_1 = __importDefault(require("axios"));
+    const generiek_1 = __importDefault(require("../nuts/generiek"));
     const workers_1 = __importDefault(require("../nuts/workers"));
     /**
      * houder van metadata, wordt heen en terug gegeven door workersNuts.zetMetaData
@@ -57,14 +56,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
             initScraper();
         }
         if (bericht.type === 'stop') {
-            rechtbankMeta = workers_1.default.zetMetaData(rechtbankMeta, {
-                status: 'gestopt'
-            });
-            process.exit();
+            stopScaper();
         }
     });
     /**
-     * initialisatiefunctie aangeroepen door message eventhandler.
+     * organisatie. initialisatiefunctie aangeroepen door message eventhandler.
      */
     function initScraper() {
         const dagenTeScrapen = lijstDagenTeScrapen();
@@ -85,6 +81,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         });
     }
     /**
+     * organisatie. Als meta werkTeDoen niet leeg, log, creer fout, anders correc afgesloten process exit.
+     */
+    function stopScaper() {
+        let werkFout = null;
+        if (rechtbankMeta.werkTeDoen.length) {
+            workers_1.default.log(`ik heb nog werk te doen maar wordt gestopt! Nog ${rechtbankMeta.werkTeDoen.length} te gaan...`);
+            werkFout = new Error('rechtbank gestopt maar werkTeDoen is nog' +
+                rechtbankMeta.werkTeDoen.length);
+        }
+        rechtbankMeta = workers_1.default.zetMetaData(rechtbankMeta, {
+            status: 'gestopt',
+            fout: werkFout ? [werkFout] : []
+        });
+        if (werkFout) {
+            throw werkFout;
+        }
+        else {
+            process.exit();
+        }
+    }
+    /**
      * lees map scrape-res/rechtbank
      * pak laatst geschreven bestand & vergelijk op datum
      * geef data terug die gescraped moeten worden
@@ -93,22 +110,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     function lijstDagenTeScrapen() {
         const rechtbankScraperRes = fs.readdirSync(`${config_1.default.pad.scrapeRes}/rechtbank`);
         const laatsteScrape = rechtbankScraperRes[rechtbankScraperRes.length - 1];
-        const dagenTeScrapen = [];
-        let datumMax = new Date(); // TODO vervangen met ref naar nuts datumlijst
-        datumMax.setDate(datumMax.getDate() - 1); // vandaag niet scrapen, staat mss nog niet online.
         let datumRef = routeNaarDatum(laatsteScrape);
-        datumRef.setDate(datumRef.getDate() + 1); // vanaf dag ná laatste scrape gaan kijken
-        // array met routes die we kunnen laten.
+        const datumMax = new Date();
         const { legeResponses } = JSON.parse(fs.readFileSync(`${config_1.default.pad.scrapeRes}/meta/rechtbankmeta.json`, 'utf-8'));
-        do {
-            const pushString = datumRef.toISOString().replace(/-/g, '').substring(0, 8); // maak YYYYMMDD
-            const pushStringRouteEq = pushString.padEnd(14, '0'); // om te vergelijken met rechtbankmetajson legeResponses.
-            if (!legeResponses.includes(pushStringRouteEq)) {
-                dagenTeScrapen.push(pushString);
-            }
-            datumRef.setDate(datumRef.getDate() + 1);
-        } while (datumRef < datumMax);
-        return dagenTeScrapen;
+        /**
+         * maakt Date[], dan YYYYMMJJ[], dan filter op eerdere lege responses.
+         */
+        return generiek_1.default
+            .datalijstTussen(datumRef, datumMax)
+            .map((datum) => {
+            return datum.toISOString().replace(/-/g, '').substring(0, 8);
+        })
+            .filter((datumAchtigeString) => {
+            return !legeResponses.includes(datumAchtigeString.padEnd(14, '0'));
+        });
     }
     /**
      * ontvangt array met data en scraped die tot klaar, stuk voor stuk
@@ -150,8 +165,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
             })
                 .then((jsonBlob) => {
                 if (!instanceOfRechtbankJSON(jsonBlob)) {
-                    // TODO debug die data ergens heen
-                    throw new Error('rechtbank JSON geen RechtbankJSON instance. antwoord in temp map');
+                    const err = new Error('rechtbank JSON geen RechtbankJSON instance. antwoord in temp map');
+                    rechtbankMeta.fout.push(err);
+                    throw err;
                 }
                 if (jsonBlob.Instanties.length === 0) {
                     scrapeResultaatLeeg(route, scrapeDatumSucces);
@@ -161,7 +177,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                 }
             })
                 .catch((err) => {
-                scrapeDatumFaal(err); // TODO
+                scrapeDatumFaal(err);
             });
         });
     }

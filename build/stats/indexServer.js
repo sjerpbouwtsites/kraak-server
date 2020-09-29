@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "http", "fs", "worker_threads"], factory);
+        define(["require", "exports", "http", "fs", "worker_threads", "../config"], factory);
     }
 })(function (require, exports) {
     "use strict";
@@ -19,6 +19,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     const http_1 = __importDefault(require("http"));
     const fs_1 = __importDefault(require("fs"));
     const worker_threads_1 = require("worker_threads");
+    const config_1 = __importDefault(require("../config"));
     async function default_1() {
         try {
             return http_1.default
@@ -27,13 +28,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                     type: 'console',
                     data: 'maak server jo!'
                 });
-                const indexPad = `${__dirname}/../public/index.html`;
-                const indexHTML = fs_1.default.readFileSync(indexPad); // TODO van nuts afhalen
+                const indexHTML = fs_1.default.readFileSync(`${config_1.default.pad.public}/index.html`);
                 res.writeHead(200, { 'Content-Type': 'text/html' });
                 res.write(indexHTML);
                 res.end();
             })
-                .listen(8080); // TODO uit opties halen
+                .listen(config_1.default.server.publicPort);
         }
         catch (e) {
             return new Error(e);

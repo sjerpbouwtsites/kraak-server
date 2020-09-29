@@ -7,13 +7,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "fs", "../nuts/generiek"], factory);
+        define(["require", "exports", "fs", "../nuts/generiek", "../config"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const fs_1 = __importDefault(require("fs"));
     const generiek_1 = __importDefault(require("../nuts/generiek"));
+    const config_1 = __importDefault(require("../config"));
     const kleurenLijst = ['#8CB3B0', '#085C67', '#0E7479', '#163F5B'];
     function maakLogHTML(workersNamen, logData) {
         return logData
@@ -67,8 +68,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
      * of hij ververst, of hij sluit.
      */
     async function default_1(logData, tabelData, workersNamen, statsIndexCSS, statIndexJS, HTML) {
-        fs_1.default.writeFileSync(`${__dirname}/../public/index.html`, // TODO via config
-        `
+        fs_1.default.writeFileSync(`${config_1.default.pad.public}/index.html`, `
   <!DOCTYPE html>
   <body>
     <head>
