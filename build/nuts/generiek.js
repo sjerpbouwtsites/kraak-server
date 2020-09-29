@@ -23,8 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         haalOp() {
             var _a, _b;
             try {
-                return (this.cache = fs_1.default.readFileSync(__dirname + this.pad, // TODO via config
-                {
+                return (this.cache = fs_1.default.readFileSync(__dirname + this.pad, {
                     encoding: 'utf-8'
                 }));
             }

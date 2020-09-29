@@ -34,7 +34,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    // TODO in maken lijst met te scrapen, meenemen wat in meta/rechtbanken/niet gevonden (oid weet ik veel) staat.
     // TODO implementeren: werk wachtrij
     // TODO implementeren: status opvragen ism. werk wachtrij
     const worker_threads_1 = require("worker_threads");
@@ -47,7 +46,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
      */
     let rechtbankMeta = {
         status: 'uit',
-        fout: []
+        fout: [],
+        werkTeDoen: [] // volgt hier dagenTeScrapen
     };
     worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (bericht) => {
         if (bericht.type === 'start') {
@@ -68,6 +68,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
      */
     function initScraper() {
         const dagenTeScrapen = lijstDagenTeScrapen();
+        rechtbankMeta.werkTeDoen = dagenTeScrapen;
         scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {
             if (scrapeExitBoodschap === true) {
                 rechtbankMeta = workers_1.default.zetMetaData(rechtbankMeta, {
@@ -97,9 +98,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         datumMax.setDate(datumMax.getDate() - 1); // vandaag niet scrapen, staat mss nog niet online.
         let datumRef = routeNaarDatum(laatsteScrape);
         datumRef.setDate(datumRef.getDate() + 1); // vanaf dag ná laatste scrape gaan kijken
+        // array met routes die we kunnen laten.
+        const { legeResponses } = JSON.parse(fs.readFileSync(`${config_1.default.pad.scrapeRes}/meta/rechtbankmeta.json`, 'utf-8'));
         do {
             const pushString = datumRef.toISOString().replace(/-/g, '').substring(0, 8); // maak YYYYMMDD
-            dagenTeScrapen.push(pushString);
+            const pushStringRouteEq = pushString.padEnd(14, '0'); // om te vergelijken met rechtbankmetajson legeResponses.
+            if (!legeResponses.includes(pushStringRouteEq)) {
+                dagenTeScrapen.push(pushString);
+            }
             datumRef.setDate(datumRef.getDate() + 1);
         } while (datumRef < datumMax);
         return dagenTeScrapen;
@@ -110,6 +116,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
      */
     async function scrapeData(dagenTeScrapen) {
         let scrapeDag = dagenTeScrapen.shift();
+        rechtbankMeta.werkTeDoen = dagenTeScrapen;
         if (!scrapeDag) {
             return true;
         }

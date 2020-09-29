@@ -78,13 +78,13 @@ function lijstDagenTeScrapen(): string[] {
   let datumRef = routeNaarDatum(laatsteScrape);
   datumRef.setDate(datumRef.getDate() + 1); // vanaf dag ná laatste scrape gaan kijken
   // array met routes die we kunnen laten.
-  const { legeScrapeResultaten } = JSON.parse(
+  const { legeResponses } = JSON.parse(
     fs.readFileSync(`${config.pad.scrapeRes}/meta/rechtbankmeta.json`, 'utf-8')
   );
   do {
     const pushString = datumRef.toISOString().replace(/-/g, '').substring(0, 8); // maak YYYYMMDD
     const pushStringRouteEq = pushString.padEnd(14, '0'); // om te vergelijken met rechtbankmetajson legeResponses.
-    if (!legeScrapeResultaten.includes(pushStringRouteEq)) {
+    if (!legeResponses.includes(pushStringRouteEq)) {
       dagenTeScrapen.push(pushString);
     }
     datumRef.setDate(datumRef.getDate() + 1);
