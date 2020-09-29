@@ -4,19 +4,20 @@
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "worker_threads", "worker_threads"], factory);
+        define(["require", "exports", "worker_threads"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.KraakWorker = void 0;
     const worker_threads_1 = require("worker_threads");
-    const worker_threads_2 = require("worker_threads");
     /**
      * Leeft in de master thread context.
      * Is een REFERENTIE aan de worker, niet de worker zelf.
      * Initieerd de Worker. Geeft de worker naam.
-     * Wrapper voor postMessage áán de worker zodat dit getyped kan worden
+     * Wrapper voor postMessage áán de worker zodat dit getyped kan worden.
+     * Via typing is alle communicatie geregeld. Zie de type defs.
+     *
      * Zet in controller context message event handlers zodat workers kunnen consol.loggen en console-lijsten (log zonder [object object] onzin)
      *
      */
@@ -25,6 +26,28 @@
             super(workerLocatie);
             this.workerLocatie = null;
             this.workerNaam = null;
+            /**
+             * ! primaire scrapers weten zelf hun werk dus bepalen zelf of ze wachtend zijn
+             * ! secundaire scrapers horen van hun meester-scraper of ze mogelijk nog werk krijgen.
+          
+             * betreft allemaal het Worker proces.
+             *
+             * uit          - ~ is onopgestart
+             * gestart      - ~ is opgestart, doet *nog* geen werk.
+             * lekker-bezig  - ~ is opgestart, en is met werk bezig.
+             * afwachtend   - ~ is opgestart, heeft nu geen werk, of meer komt onduidelijk
+             * afgekapt     - ~ is opgelegd gestopt, maar heeft nog werk hebben.
+             * mss-afgekapt - ~ is opgelegd gestopt,
+             *                   maar had mogelijk meer werk gekregen.
+             * verloren     - ~ gestopt door een uncaughtException
+             * foute-limbo  - ~ is ogestart, ving fout af, zit nu vast
+             * klaar        - ~ is opgestart, heeft nooit meer werk.
+             * opgeruimd    - ~ is gestopt, heeft nooit meer werk.
+             */
+            this.workerThreadStatus = 'uit';
+            this.workerArbeidsRelatie = workerLocatie.includes('primair')
+                ? 'primair'
+                : 'secundair';
             this.zetNaam(workerLocatie);
             this.zetOnMessage();
             return this;
@@ -45,11 +68,10 @@
             }
         }
         /**
-         * LEGACY log methode... gehouden omdat de logger in
+         * oude log methode... gehouden omdat de logger in
          * de browser kapot kan gaan vanwege redenen
-         * deze
+         * deze is handig erbij
          * @deprecated
-         * @param bericht KraakBerichtVanWorker
          */
         console(bericht) {
             var _a;
@@ -60,30 +82,24 @@
          */
         zetOnMessage() {
             this.on('message', (bericht) => {
-                var _a, _b, _c, _d;
+                var _a;
                 if (bericht.type === 'console') {
                     this.console(bericht);
                 }
-                if (bericht.type === 'status') {
+                if (bericht.type === 'stats') {
                     if (!this.statsWorker) {
                         throw new Error(`KOPPEL EERST DE STATWORKER AAN ${this.workerNaam}`);
                         return;
                     }
-                    if (!(bericht === null || bericht === void 0 ? void 0 : bericht.data.tabel) && !(bericht === null || bericht === void 0 ? void 0 : bericht.data.log)) {
-                        worker_threads_2.parentPort === null || worker_threads_2.parentPort === void 0 ? void 0 : worker_threads_2.parentPort.postMessage({
-                            type: 'console',
-                            data: `${this.workerNaam} statusUpdate object niet goed gevormd.`
-                        });
-                    }
-                    const debugBericht = {
+                    const d = bericht.data;
+                    (_a = this.statsWorker) === null || _a === void 0 ? void 0 : _a.berichtAanWorker({
                         type: 'subtaak-delegatie',
                         data: {
-                            log: (_a = bericht === null || bericht === void 0 ? void 0 : bericht.data) === null || _a === void 0 ? void 0 : _a.log,
-                            naam: ((_b = bericht === null || bericht === void 0 ? void 0 : bericht.data) === null || _b === void 0 ? void 0 : _b.naam) || this.workerNaam || 'onbekend',
-                            tabel: (_c = bericht === null || bericht === void 0 ? void 0 : bericht.data) === null || _c === void 0 ? void 0 : _c.tabel
+                            log: d.log,
+                            naam: bericht.workerNaam || this.workerNaam || 'onbekend',
+                            tabel: d.tabel
                         }
-                    };
-                    (_d = this.statsWorker) === null || _d === void 0 ? void 0 : _d.berichtAanWorker(debugBericht);
+                    });
                 }
             });
             return this;

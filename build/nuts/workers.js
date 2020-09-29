@@ -19,25 +19,27 @@
          * @param logbericht string
          */
         log(logbericht) {
-            worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                type: 'status',
+            const ppMessage = {
+                type: 'stats',
                 data: {
                     log: logbericht
                 }
-            });
+            };
+            worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage(ppMessage);
         },
         /**
          *
          * naam wordt toegevoegd door kraak-worker, waar het quasi-doorheen gaat.
          * @param data kan ieder object zijn.
          */
-        tabel(data) {
-            worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
-                type: 'status',
+        tabel(teTabelleren) {
+            const ppMessage = {
+                type: 'stats',
                 data: {
-                    tabel: data
+                    tabel: teTabelleren
                 }
-            });
+            };
+            worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage(ppMessage);
         },
         /**
          * Kort voor de parentPort methode.
@@ -50,13 +52,39 @@
             });
         },
         /**
+         * bericht type commando mag slechts start, stop en opruimen zijn.
+         * Dat kunnen drie callbacks ook prima generiek.
+         * @param bericht
+         * @param startCallback
+         * @param stopCallback
+         * @param opruimenCallback
+         */
+        commandoTypeBerichtBehandelaar(bericht, startCallback, stopCallback, opruimenCallback) {
+            if (bericht.type !== 'commando')
+                return;
+            const { commando } = bericht.data;
+            switch (commando) {
+                case 'start':
+                    startCallback();
+                    break;
+                case 'stop':
+                    stopCallback();
+                    break;
+                case 'opruimen':
+                    opruimenCallback();
+                    break;
+                default:
+                    throw new Error('bericht misvormd');
+            }
+        },
+        /**
          * Bewerkt meta data object van workers en geeft dat terug.
          * roept statsworker aan met meta data object.
          * @param metaObject bestaand data object van worker.
          * @param dataObject nieuw op te slane data.
          * @param tabel boolean, of de tabel herbouwt wordt. true.
          * @param log boolean, of alle entrees van de dataObject in log komen. S
-         * @returns metaObject
+         * @returns metaObject // TODO gaat mss helemaal er uit
          */
         zetMetaData(metaObject, dataObject, tabel = true, log = true) {
             Object.entries(dataObject).forEach(([metaKey, metaValue]) => {

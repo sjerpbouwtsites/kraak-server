@@ -21,9 +21,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     indexServer_1.default();
     const statsWorker = new kraak_worker_1.KraakWorker('./build/stats/stats.js');
     statsWorker.koppelStatsWorker();
-    statsWorker.berichtAanWorker({ type: 'start' });
-    statsWorker.console({ type: 'console', data: 'tekst' });
-    process.exit();
+    statsWorker.berichtAanWorker({
+        type: 'commando',
+        data: { commando: 'start' }
+    });
     // gebruikt tijdens dev... om fs te bewerken
     try {
         pre_run_js_1.default({ aantalRechtbankScrapesWeg: 0 });
@@ -43,7 +44,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         rechtbankScraper.koppelStatsWorker(statsWorker);
         const faillissementenLezer = new kraak_worker_1.KraakWorker('./build/secundair/faillezer.js');
         faillissementenLezer.koppelStatsWorker(statsWorker);
-        rechtbankScraper.berichtAanWorker({ type: 'start' });
+        rechtbankScraper.berichtAanWorker({
+            type: 'commando',
+            data: { commando: 'start' }
+        });
         rechtbankScraper.on('message', (bericht) => {
             if (bericht.type === 'subtaak-delegatie') {
                 faillissementenLezer.berichtAanWorker(bericht);

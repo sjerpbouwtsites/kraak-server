@@ -27,24 +27,35 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         fout: []
     };
     worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (bericht) => {
-        if (bericht.type === 'start') {
-            faillezerMeta = workers_1.default.zetMetaData(faillezerMeta, {
-                status: 'gestart'
-            }, true, false);
-        }
-        if (bericht.type === 'stop') {
-            faillezerMeta = workers_1.default.zetMetaData(faillezerMeta, {
-                status: 'gestart'
-            }, true, false);
-            process.exit();
-        }
-        if (bericht.type === 'subtaak-delegatie' && !!bericht.data) {
-            const antwoord = verwerkFaillissementScrape(bericht.data);
-            const berichtTerug = {
-                type: 'console',
-                data: antwoord
-            };
-            worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage(berichtTerug);
+        workers_1.default.commandoTypeBerichtBehandelaar(bericht, initFaillezer, stopFaillezer, ruimScraperOp);
+    });
+    function initFaillezer() {
+        // faillezerMeta = workersNuts.zetMetaData(
+        //   faillezerMeta,
+        //   {
+        //     status: 'gestart'
+        //   },
+        //   true,
+        //   false
+        // );
+    }
+    function stopFaillezer() {
+        // faillezerMeta = workersNuts.zetMetaData(
+        //   faillezerMeta,
+        //   {
+        //     status: 'gestopt'
+        //   },
+        //   true,
+        //   false
+        // );
+        process.exit();
+    }
+    function ruimScraperOp() {
+        //
+    }
+    worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (bericht) => {
+        if (bericht.type === 'subtaak-delegatie' && bericht.data) {
+            verwerkFaillissementScrape(bericht.data);
         }
     });
     /**
@@ -151,33 +162,5 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     ${kvk.kvkNummer} ${kvk.datum} ${kvk.faillissementsID}
     `;
         });
-        gevondenKvK;
     }
 });
-// function relevantePublicatieClusters(route) {
-//   const toegestaneClusters = opties.toegestaneClusters;
-//   const ontoegestaneClusters = opties.ontoegestaneClusters;
-//   return new Promise((resolve, reject) => {
-//     try {
-//       const responseBestand = nuts.pakOpslag(`responses/rechtbank/${route}`);
-//       const publicatieClusters = responseBestand.Instanties.map((instantie) => {
-//         return instantie.Publicatieclusters;
-//       })
-//         .flat()
-//         .filter((pc) => {
-//           const pco = pc.PublicatieclusterOmschrijving;
-//           if (toegestaneClusters.includes(pco)) {
-//             return true;
-//           } else if (!ontoegestaneClusters.includes(pco)) {
-//             console.log('pc cluster omschrijving onbekend: ' + pco);
-//             return false;
-//           } else {
-//             return false;
-//           }
-//         });
-//       resolve(publicatieClusters);
-//     } catch (error) {
-//       reject(error);
-//     }
-//   });
-// }

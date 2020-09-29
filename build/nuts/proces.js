@@ -20,12 +20,13 @@
          */
         stop(statsWorker) {
             statsWorker.berichtAanWorker({
-                type: 'stop'
+                type: 'commando',
+                data: { commando: 'stop' }
             });
             statsWorker.on('message', function (bericht) {
-                var _a, _b;
-                if (bericht.type === 'status') {
-                    if (((_b = (_a = bericht === null || bericht === void 0 ? void 0 : bericht.data) === null || _a === void 0 ? void 0 : _a.tabel) === null || _b === void 0 ? void 0 : _b.status) === 'dood') {
+                if (bericht.type === 'status-antwoord') {
+                    const bd = bericht.data;
+                    if (bd.status === 'opgeruimd') {
                         process.exit();
                     }
                     else {
