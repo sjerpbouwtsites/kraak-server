@@ -2,7 +2,6 @@
  * @file Worker. Leest map scrape-res uit voor de laatste succesvolle rechtank scrape en haalt alle missende één voor één op. 'gevulde' scrape resultaten worden als bestand opgeslagen & via referentie aan de controller doorgegeven.
  */
 
-// TODO in maken lijst met te scrapen, meenemen wat in meta/rechtbanken/niet gevonden (oid weet ik veel) staat.
 // TODO implementeren: werk wachtrij
 // TODO implementeren: status opvragen ism. werk wachtrij
 
@@ -18,7 +17,8 @@ import workersNuts, { workerMetaData } from '../nuts/workers';
  */
 let rechtbankMeta: workerMetaData = {
   status: 'uit',
-  fout: []
+  fout: [],
+  werkTeDoen: [] // volgt hier dagenTeScrapen
 };
 
 parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
@@ -41,6 +41,7 @@ parentPort?.on('message', (bericht: KraakBerichtAanWorker) => {
  */
 function initScraper() {
   const dagenTeScrapen = lijstDagenTeScrapen();
+  rechtbankMeta.werkTeDoen = dagenTeScrapen;
   scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {
     if (scrapeExitBoodschap === true) {
       rechtbankMeta = workersNuts.zetMetaData(rechtbankMeta, {
@@ -76,9 +77,16 @@ function lijstDagenTeScrapen(): string[] {
 
   let datumRef = routeNaarDatum(laatsteScrape);
   datumRef.setDate(datumRef.getDate() + 1); // vanaf dag ná laatste scrape gaan kijken
+  // array met routes die we kunnen laten.
+  const { legeScrapeResultaten } = JSON.parse(
+    fs.readFileSync(`${config.pad.scrapeRes}/meta/rechtbankmeta.json`, 'utf-8')
+  );
   do {
     const pushString = datumRef.toISOString().replace(/-/g, '').substring(0, 8); // maak YYYYMMDD
-    dagenTeScrapen.push(pushString);
+    const pushStringRouteEq = pushString.padEnd(14, '0'); // om te vergelijken met rechtbankmetajson legeResponses.
+    if (!legeScrapeResultaten.includes(pushStringRouteEq)) {
+      dagenTeScrapen.push(pushString);
+    }
     datumRef.setDate(datumRef.getDate() + 1);
   } while (datumRef < datumMax);
 
@@ -91,6 +99,7 @@ function lijstDagenTeScrapen(): string[] {
  */
 async function scrapeData(dagenTeScrapen: string[]) {
   let scrapeDag = dagenTeScrapen.shift();
+  rechtbankMeta.werkTeDoen = dagenTeScrapen;
   if (!scrapeDag) {
     return true;
   }

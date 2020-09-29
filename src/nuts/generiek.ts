@@ -13,12 +13,9 @@ class BasisBestandOphaler {
   }
   public haalOp() {
     try {
-      return (this.cache = fs.readFileSync(
-        __dirname + this.pad, // TODO via config
-        {
-          encoding: 'utf-8'
-        }
-      ));
+      return (this.cache = fs.readFileSync(__dirname + this.pad, {
+        encoding: 'utf-8'
+      }));
     } catch (err) {
       const s = this.pad?.split('/') ?? 'bestandspad/raadsel.wtf';
       const soortVanNaam = s[s.length - 1].replace('.', ' ');
