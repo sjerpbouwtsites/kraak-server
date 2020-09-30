@@ -3,7 +3,8 @@
  */
 
 import { parentPort } from 'worker_threads';
-import { KraakBerichtData, KraakBericht } from '../kraak-worker';
+import { KraakBerichtData, KraakBericht, KraakWorker } from '../kraak-worker';
+import fs from 'fs';
 
 export default {
   /**
@@ -98,6 +99,22 @@ export default {
       this.tabel(metaObject);
     }
     return metaObject;
+  },
+  /**
+   * Als je een verkeerde workerLocatie opgeeft krijg je geen foutmelding. Nergens. De worker constrctor doet geen bestandscontrole of meld dat iig niet. Omdat kraak worker contructor als eerste super() aanroept voor de Worker constructor kan je zelf geen bestandscontrole doen. Vandaar deze wrapper. Eindresultaat van uuuuuren debuggen.
+   * @param workerLocatie
+   */
+  maakWorker(workerLocatie: string): KraakWorker {
+    if (!fs.existsSync(workerLocatie)) {
+      throw new Error(`geen bestand gevonden op ${workerLocatie}`);
+    }
+    const workerPoging = new KraakWorker(workerLocatie);
+    if (!(workerPoging instanceof KraakWorker)) {
+      throw new Error(
+        `KraakWorker class geeft geen kraak worker terug voor adres ${workerLocatie}`
+      );
+    }
+    return workerPoging;
   }
 };
 

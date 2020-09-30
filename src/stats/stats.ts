@@ -48,10 +48,7 @@ parentPort?.on('message', (bericht: KraakBericht) => {
 
 parentPort?.on('message', (bericht: KraakBericht) => {
   if (bericht.type === 'subtaak-delegatie') {
-    verwerkNieuweDebug(
-      bericht.data as KraakBerichtData.Stats,
-      bericht?.workerNaam
-    );
+    verwerkNieuweDebug(bericht.data as KraakBerichtData.Stats);
     statHTMLWrap();
   }
 });
@@ -59,22 +56,16 @@ parentPort?.on('message', (bericht: KraakBericht) => {
 /**
  * effectief handler voor on.message type 'subtaak-delegatie'
  */
-function verwerkNieuweDebug(
-  berichtData: KraakBerichtData.Stats,
-  workerNaam: string = 'onbekend'
-) {
-  if (berichtData?.log) {
-    logData.push({
-      naam: workerNaam,
-      log: berichtData?.log
-    });
+function verwerkNieuweDebug(berichtData: KraakBerichtData.Stats) {
+  if (berichtData?.log && berichtData?.naam) {
+    logData.push(berichtData as LogStuk);
   }
-  if (berichtData?.tabel) {
-    const wn = workerNaam;
+  if (berichtData?.tabel && berichtData?.naam) {
+    const wn = berichtData?.naam;
     const eerdereTabelData = tabelData.find((td) => td.naam === wn) ?? false;
     if (!eerdereTabelData) {
       tabelData.push({
-        naam: workerNaam,
+        naam: berichtData?.naam,
         tabel: berichtData?.tabel
       });
     } else {
@@ -83,8 +74,8 @@ function verwerkNieuweDebug(
       });
     }
   }
-  if (!workersNamen.includes(workerNaam)) {
-    workersNamen.push(workerNaam);
+  if (!workersNamen.includes(berichtData?.naam)) {
+    workersNamen.push(berichtData?.naam);
   }
 }
 
@@ -109,6 +100,7 @@ function startStatWorker(): void {
  * sluit statpagina af, meld status aan controller.
  */
 function stopStatWorker(): void {
+  workersNuts.log('gestopt');
   statsWorkerMeta.streaming = false;
   statHTMLWrap().then(() => {
     setTimeout(function () {

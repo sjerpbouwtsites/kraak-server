@@ -13,6 +13,13 @@
         color: #8CB3B0
       }      
     
+      .bg-kleur--1 {
+        background-color: #085C67
+      }
+      .letter-kleur--1 {
+        color: #085C67
+      }      
+    
       /* 
   Ik kreeg niet zo snel uitgevogeld hoe die server te configureren een bepaalde map te server. Dus dit bestand wordt uitgelezen en in de HTML gekwakt in stats.ts 🖤
 */
@@ -55,7 +62,19 @@ body {
     <ul class='kraak-log'>
       <li class='log-stuk bg-kleur--0'>
           <span class='log-links'>gestart                            </span>
-          <span class='log-rechts'>onbekend</span>
+          <span class='log-rechts'>stats</span>
+        </li><li class='log-stuk bg-kleur--1'>
+          <span class='log-links'>gestart rechtbanken                </span>
+          <span class='log-rechts'>rechtbanken</span>
+        </li><li class='log-stuk bg-kleur--1'>
+          <span class='log-links'>scrapede route 20200930000000 - was gevuld</span>
+          <span class='log-rechts'>rechtbanken</span>
+        </li><li class='log-stuk bg-kleur--1'>
+          <span class='log-links'>status gestopt                     </span>
+          <span class='log-rechts'>rechtbanken</span>
+        </li><li class='log-stuk bg-kleur--0'>
+          <span class='log-links'>gestopt                            </span>
+          <span class='log-rechts'>stats</span>
         </li>
     </ul>
         <div class='kraak-stats'>
@@ -67,6 +86,16 @@ body {
 
         <div class='kraak-kaarten'>
     
+          <div class='kraak-kaart bg-kleur--1'>
+            <header class='kraak-kaart-header'>
+              <h2 class='kraak-kaart-kop'>rechtbanken</h2>
+              <div class='kraak-kaart-brood'>
+                status:  - gestopt
+fout:  - 
+werkTeDoen:  - 
+              </div>
+          </div>
+        
   </div>
         </div>
         <footer class='kraak-footer'>spatie om te stoppen.</footer>

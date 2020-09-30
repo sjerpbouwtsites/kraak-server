@@ -114,6 +114,8 @@
          * @param bericht KraakWorkerBericht type
          */
         berichtAanWorker(bericht) {
+            console.log(`\n${this.workerNaam}`);
+            console.log(bericht);
             this.postMessage(bericht);
             return this;
         }

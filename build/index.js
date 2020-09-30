@@ -7,19 +7,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "./kraak-worker", "./nuts/proces", "./nuts/generiek", "./stats/indexServer", "./pre-run.js"], factory);
+        define(["require", "exports", "./nuts/proces", "./nuts/generiek", "./nuts/workers", "./stats/indexServer", "./pre-run.js"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const kraak_worker_1 = require("./kraak-worker");
     const proces_1 = __importDefault(require("./nuts/proces"));
     const generiek_1 = __importDefault(require("./nuts/generiek"));
+    const workers_1 = __importDefault(require("./nuts/workers"));
     const indexServer_1 = __importDefault(require("./stats/indexServer"));
     const pre_run_js_1 = __importDefault(require("./pre-run.js"));
     // start http server met statWorker resultaat.
     indexServer_1.default();
-    const statsWorker = new kraak_worker_1.KraakWorker('./build/stats/stats.js');
+    const statsWorker = workers_1.default.maakWorker('./build/stats/stats.js');
     statsWorker.koppelStatsWorker();
     statsWorker.berichtAanWorker({
         type: 'commando',
@@ -40,9 +40,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     }
     proces_1.default.nodeVersieControle();
     async function init() {
-        const rechtbankScraper = new kraak_worker_1.KraakWorker('./build/scrapers/rechtbanken.js');
+        const rechtbankScraper = workers_1.default.maakWorker('./build/primair/rechtbanken.js');
         rechtbankScraper.koppelStatsWorker(statsWorker);
-        const faillissementenLezer = new kraak_worker_1.KraakWorker('./build/secundair/faillezer.js');
+        const faillissementenLezer = workers_1.default.maakWorker('./build/secundair/faillezer.js');
         faillissementenLezer.koppelStatsWorker(statsWorker);
         rechtbankScraper.berichtAanWorker({
             type: 'commando',

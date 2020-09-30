@@ -18,6 +18,6 @@ document.getElementsByTagName('body')[0].addEventListener('keydown', (e) => {
 
 setTimeout(() => {
   if (afsluitenGaatDoor) {
-    close();
+    //close(); //TODO tijdelijk niet meer afsluiten
   }
 }, rt);

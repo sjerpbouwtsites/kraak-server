@@ -1,18 +1,23 @@
 /**
  * gemene nutsfuncties van de varia workers.
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 (function (factory) {
     if (typeof module === "object" && typeof module.exports === "object") {
         var v = factory(require, exports);
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define(["require", "exports", "worker_threads"], factory);
+        define(["require", "exports", "worker_threads", "../kraak-worker", "fs"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const worker_threads_1 = require("worker_threads");
+    const kraak_worker_1 = require("../kraak-worker");
+    const fs_1 = __importDefault(require("fs"));
     exports.default = {
         /**
          * naam wordt toegevoegd door kraak-worker, waar het quasi-doorheen gaat.
@@ -97,6 +102,20 @@
                 this.tabel(metaObject);
             }
             return metaObject;
+        },
+        /**
+         * Als je een verkeerde workerLocatie opgeeft krijg je geen foutmelding. Nergens. De worker constrctor doet geen bestandscontrole of meld dat iig niet. Omdat kraak worker contructor als eerste super() aanroept voor de Worker constructor kan je zelf geen bestandscontrole doen. Vandaar deze wrapper. Eindresultaat van uuuuuren debuggen.
+         * @param workerLocatie
+         */
+        maakWorker(workerLocatie) {
+            if (!fs_1.default.existsSync(workerLocatie)) {
+                throw new Error(`geen bestand gevonden op ${workerLocatie}`);
+            }
+            const workerPoging = new kraak_worker_1.KraakWorker(workerLocatie);
+            if (!(workerPoging instanceof kraak_worker_1.KraakWorker)) {
+                throw new Error(`KraakWorker class geeft geen kraak worker terug voor adres ${workerLocatie}`);
+            }
+            return workerPoging;
         }
     };
 });

@@ -46,27 +46,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     });
     worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.on('message', (bericht) => {
         if (bericht.type === 'subtaak-delegatie') {
-            verwerkNieuweDebug(bericht.data, bericht === null || bericht === void 0 ? void 0 : bericht.workerNaam);
+            verwerkNieuweDebug(bericht.data);
             statHTMLWrap();
         }
     });
     /**
      * effectief handler voor on.message type 'subtaak-delegatie'
      */
-    function verwerkNieuweDebug(berichtData, workerNaam = 'onbekend') {
+    function verwerkNieuweDebug(berichtData) {
         var _a;
-        if (berichtData === null || berichtData === void 0 ? void 0 : berichtData.log) {
-            logData.push({
-                naam: workerNaam,
-                log: berichtData === null || berichtData === void 0 ? void 0 : berichtData.log
-            });
+        if ((berichtData === null || berichtData === void 0 ? void 0 : berichtData.log) && (berichtData === null || berichtData === void 0 ? void 0 : berichtData.naam)) {
+            logData.push(berichtData);
         }
-        if (berichtData === null || berichtData === void 0 ? void 0 : berichtData.tabel) {
-            const wn = workerNaam;
+        if ((berichtData === null || berichtData === void 0 ? void 0 : berichtData.tabel) && (berichtData === null || berichtData === void 0 ? void 0 : berichtData.naam)) {
+            const wn = berichtData === null || berichtData === void 0 ? void 0 : berichtData.naam;
             const eerdereTabelData = (_a = tabelData.find((td) => td.naam === wn)) !== null && _a !== void 0 ? _a : false;
             if (!eerdereTabelData) {
                 tabelData.push({
-                    naam: workerNaam,
+                    naam: berichtData === null || berichtData === void 0 ? void 0 : berichtData.naam,
                     tabel: berichtData === null || berichtData === void 0 ? void 0 : berichtData.tabel
                 });
             }
@@ -76,8 +73,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                 });
             }
         }
-        if (!workersNamen.includes(workerNaam)) {
-            workersNamen.push(workerNaam);
+        if (!workersNamen.includes(berichtData === null || berichtData === void 0 ? void 0 : berichtData.naam)) {
+            workersNamen.push(berichtData === null || berichtData === void 0 ? void 0 : berichtData.naam);
         }
     }
     function statHTMLWrap() {
@@ -85,10 +82,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         const JS = s ? StatIndexReloadJS.bestand : StatIndexAfsluitenJS.bestand;
         const HTML = s ? statHtmlReload : statHtmlAfsluiten;
         const CSS = true ? StatsIndexCSS.bestand : StatsIndexCSS.bestand;
-        return stats_html_1.default(logData, tabelData, workersNamen, CSS, JS, HTML).then((r) => {
-            worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({ type: 'console', data: 'html gebouwd' });
-            return r;
-        });
+        return stats_html_1.default(logData, tabelData, workersNamen, CSS, JS, HTML).then((r) => r);
     }
     function startStatWorker() {
         statHTMLWrap().then(() => {
@@ -100,6 +94,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
      * sluit statpagina af, meld status aan controller.
      */
     function stopStatWorker() {
+        workers_1.default.log('gestopt');
         statsWorkerMeta.streaming = false;
         statHTMLWrap().then(() => {
             setTimeout(function () {

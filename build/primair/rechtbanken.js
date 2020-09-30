@@ -55,6 +55,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
      * organisatie. initialisatiefunctie aangeroepen door message eventhandler.
      */
     function initScraper() {
+        worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ? void 0 : worker_threads_1.parentPort.postMessage({
+            type: 'console',
+            data: 'rechtbanken init functie'
+        });
+        workers_1.default.log('gestart rechtbanken');
         const dagenTeScrapen = lijstDagenTeScrapen();
         rechtbankMeta.werkTeDoen = dagenTeScrapen;
         scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {

@@ -32,6 +32,11 @@ parentPort?.on('message', (bericht: KraakBericht) => {
  * organisatie. initialisatiefunctie aangeroepen door message eventhandler.
  */
 function initScraper() {
+  parentPort?.postMessage({
+    type: 'console',
+    data: 'rechtbanken init functie'
+  });
+  workersNuts.log('gestart rechtbanken');
   const dagenTeScrapen = lijstDagenTeScrapen();
   rechtbankMeta.werkTeDoen = dagenTeScrapen;
   scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {

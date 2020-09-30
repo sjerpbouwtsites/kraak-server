@@ -116,6 +116,8 @@ export class KraakWorker extends Worker {
    * @param bericht KraakWorkerBericht type
    */
   berichtAanWorker(bericht: KraakBericht): KraakWorker {
+    console.log(`\n${this.workerNaam}`);
+    console.log(bericht);
     this.postMessage(bericht);
     return this;
   }
@@ -178,6 +180,7 @@ export namespace KraakBerichtData {
   export interface Stats {
     log?: string;
     tabel?: object;
+    naam: string;
   }
   export interface StatusVerzoek {
     [index: string]: never;
