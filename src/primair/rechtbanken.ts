@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /**
  * @file Worker. Leest map scrape-res uit voor de laatste succesvolle rechtank scrape en haalt alle missende één voor één op. 'gevulde' scrape resultaten worden als bestand opgeslagen & via referentie aan de controller doorgegeven.
  */
@@ -7,7 +8,7 @@ import * as fs from 'fs';
 import config from '../config';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import nuts from '../nuts/generiek';
-import { KraakBericht, KraakBerichtData } from '../kraak-worker';
+import { KraakBericht } from '../kraak-worker';
 import workersNuts, { workerMetaData } from '../nuts/workers';
 
 /**
@@ -92,12 +93,18 @@ function ruimScraperOp() {
  * data als YYYY-MM-DD
  */
 function lijstDagenTeScrapen(): string[] {
-  const rechtbankScraperRes = fs.readdirSync(
-    `${config.pad.scrapeRes}/rechtbank`
-  );
+  const rechtbankScraperRes = (() => {
+    try {
+      return fs.readdirSync(`${config.pad.scrapeRes}/rechtbank`);
+    } catch (err) {
+      // TODO LOG
+      console.log(err); // ts neppen
+      throw err;
+    }
+  })();
 
   const laatsteScrape = rechtbankScraperRes[rechtbankScraperRes.length - 1];
-  let datumRef = routeNaarDatum(laatsteScrape);
+  const datumRef = routeNaarDatum(laatsteScrape);
   const datumMax = new Date();
 
   const { legeResponses } = JSON.parse(
@@ -158,16 +165,8 @@ function scrapeDatum(this: any, datum: string): Promise<scrapeDatumAns> {
         return antwoord.data;
       })
       .then((jsonBlob: RechtbankJSON) => {
-        if (!instanceOfRechtbankJSON(jsonBlob)) {
-          const err = new Error(
-            'rechtbank JSON geen RechtbankJSON instance. antwoord in temp map'
-          );
-          rechtbankMeta.fout.push(err);
-          throw err;
-        }
-
         if (jsonBlob.Instanties.length === 0) {
-          scrapeResultaatLeeg(route, scrapeDatumSucces);
+          scrapeResultaatLeeg(route, scrapeDatumSucces as any);
         } else {
           scrapeResultaatGevuld(jsonBlob, route, scrapeDatumSucces);
         }
@@ -181,7 +180,10 @@ function scrapeDatum(this: any, datum: string): Promise<scrapeDatumAns> {
 /**
  * Organisatie functie als de rechtbanken een goed gevormd antwoord geven ZONDER resultaat.
  */
-function scrapeResultaatLeeg(route: string, succesFunc: Function) {
+function scrapeResultaatLeeg(
+  route: string,
+  succesFunc: (arg: TypeRouteObj) => Record<string, unknown>
+) {
   const rechtbankMeta = JSON.parse(
     fs.readFileSync(`${config.pad.scrapeRes}/meta/rechtbankmeta.json`, 'utf-8')
   );
@@ -202,7 +204,7 @@ function scrapeResultaatLeeg(route: string, succesFunc: Function) {
 async function scrapeResultaatGevuld(
   jsonBlob: any,
   route: string,
-  succesFunc: Function
+  succesFunc: any
 ) {
   const opslagPad = `${config.pad.scrapeRes}/rechtbank/${route}.json`;
   return fs.writeFile(opslagPad, JSON.stringify(jsonBlob), () => {
@@ -214,10 +216,15 @@ async function scrapeResultaatGevuld(
   });
 }
 
+interface TypeRouteObj {
+  type: string;
+  route: string;
+}
+
 interface scrapeDatumAns {
   type: 'leeg' | 'gevuld';
   route: string;
-  json?: object;
+  json?: Record<string, unknown>;
 }
 export interface RechtbankJSON {
   Instanties: Instantie[];
@@ -226,7 +233,7 @@ export interface RechtbankJSON {
 
 interface Instantie {
   PublicerendeInstantieOmschrijving: string;
-  Locaties: object[];
+  Locaties: Record<string, unknown>[];
   Publicatieclusters: Publicatieclusters;
 }
 
@@ -265,22 +272,6 @@ export type publicatieClusterOmschrijving =
   | 'vervanging cur / bwv'
   | 'zittingen in faillissementen'
   | 'zittingen in schuldsaneringen';
-
-/**
- *
- * @param jsonBlob
- * @returns boolean
- * Wie maakt er nu een 'typed' versie van JS als compileertaal terwijl
- * JS in essentie een in de browser geinterpreteerde taal is?
- * Mensen die nooit antwoorden krijgen van servers.
- *
- */
-function instanceOfRechtbankJSON(jsonBlob: object): boolean {
-  if (!jsonBlob.hasOwnProperty('Instanties')) {
-    return false;
-  }
-  return true;
-}
 
 function routeNaarDatum(routeNaam: string) {
   const d = routeNaam.replace('000000.json', '');
