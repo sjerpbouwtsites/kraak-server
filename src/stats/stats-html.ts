@@ -28,7 +28,7 @@ function tabelKaarten(workersNamen: string[], tabelData: TabelStuk[]): string {
             <header class='kraak-kaart-header'>
               <h2 class='kraak-kaart-kop'>${tabelStuk.naam}</h2>
               <div class='kraak-kaart-brood'>
-                ${nuts.objectNaarTekst(tabelStuk.tabel)}
+                ${nuts.objectNaarTekst(tabelStuk.tabel, 0, true)}
               </div>
           </div>
         `;

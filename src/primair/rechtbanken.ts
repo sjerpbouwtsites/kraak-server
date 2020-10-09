@@ -36,8 +36,9 @@ function initScraper() {
     type: 'console',
     data: 'rechtbanken init functie'
   });
-  workersNuts.log('gestart rechtbanken');
+  workersNuts.log('gestart');
   const dagenTeScrapen = lijstDagenTeScrapen();
+  workersNuts.tabel(dagenTeScrapen);
   rechtbankMeta.werkTeDoen = dagenTeScrapen;
   scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {
     if (scrapeExitBoodschap === true) {

@@ -15,6 +15,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     const fs_1 = __importDefault(require("fs"));
     /**
      * @file Die nutsfuncties die generiek toe te passen zijn.
+     * @throws als bestand niet gevonden wordt
      */
     class BasisBestandOphaler {
         constructor(pad) {
@@ -52,32 +53,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         /**
          * converteert een willekeurig object naar tekst.
          * als een value niet een string, number oid is dan wordt de functie recursief gebruikt.
-         * @param object
+         * @param object te vertteksten
+         * @param diepte gebruikt voor interne recursie
+         * @param htmlStijl teruggeven met \n of <br>
          */
-        objectNaarTekst(object, diepte = 0) {
+        objectNaarTekst(object, diepte = 0, htmlStijl = false) {
             const r = [];
-            let d = diepte;
+            const d = diepte;
             const inspringing = d * 2;
-            for (let a in object) {
+            for (const a in object) {
                 let oa = object[a];
                 if (!['boolean', 'number', 'date', 'string', 'undefined', 'null'].includes(typeof oa)) {
-                    oa = this.objectNaarTekst(oa, d);
+                    oa = this.objectNaarTekst(oa, d, htmlStijl);
                 }
                 r.push(`${a}:  - ${oa}`.padStart(inspringing));
             }
-            return r.join('\n');
+            return r.join(htmlStijl ? '\n' : '<br>');
         },
         /**
          * geeft lijst met Date objecten tussen data.
          */
         datalijstTussen(beginDatum, totDatum) {
-            let datumRef = new Date(beginDatum); // geen directe verandering
+            const datumRef = new Date(beginDatum); // geen directe verandering
             datumRef.setDate(datumRef.getDate() + 1); // vanaf dag ná
-            let r = [];
-            do {
+            const r = [];
+            while (datumRef < totDatum) {
                 r.push(new Date(datumRef));
                 datumRef.setDate(datumRef.getDate() + 1);
-            } while (datumRef < totDatum);
+            }
             return r;
         },
         BasisBestandOphaler

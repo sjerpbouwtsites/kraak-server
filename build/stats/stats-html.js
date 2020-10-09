@@ -38,7 +38,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
             <header class='kraak-kaart-header'>
               <h2 class='kraak-kaart-kop'>${tabelStuk.naam}</h2>
               <div class='kraak-kaart-brood'>
-                ${generiek_1.default.objectNaarTekst(tabelStuk.tabel)}
+                ${generiek_1.default.objectNaarTekst(tabelStuk.tabel, 0, true)}
               </div>
           </div>
         `;

@@ -16,7 +16,7 @@ statsWorker.berichtAanWorker({
 
 // gebruikt tijdens dev... om fs te bewerken
 try {
-  preRunScripts({ aantalRechtbankScrapesWeg: 0 });
+  preRunScripts({ aantalRechtbankScrapesWeg: 5 });
 } catch (err) {
   statsWorker.berichtAanWorker({
     type: 'subtaak-delegatie',
@@ -34,11 +34,15 @@ async function init() {
     './build/primair/rechtbanken.js'
   );
   rechtbankScraper.koppelStatsWorker(statsWorker);
+  rechtbankScraper.berichtAanWorker({
+    type: 'commando',
+    data: { commando: 'start' }
+  });
   const faillissementenLezer = workersNuts.maakWorker(
     './build/secundair/faillezer.js'
   );
   faillissementenLezer.koppelStatsWorker(statsWorker);
-  rechtbankScraper.berichtAanWorker({
+  faillissementenLezer.berichtAanWorker({
     type: 'commando',
     data: { commando: 'start' }
   });

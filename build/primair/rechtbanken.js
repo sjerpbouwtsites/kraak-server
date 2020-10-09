@@ -59,8 +59,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
             type: 'console',
             data: 'rechtbanken init functie'
         });
-        workers_1.default.log('gestart rechtbanken');
+        workers_1.default.log('gestart');
         const dagenTeScrapen = lijstDagenTeScrapen();
+        workers_1.default.tabel(dagenTeScrapen);
         rechtbankMeta.werkTeDoen = dagenTeScrapen;
         scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {
             if (scrapeExitBoodschap === true) {

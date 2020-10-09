@@ -27,7 +27,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     });
     // gebruikt tijdens dev... om fs te bewerken
     try {
-        pre_run_js_1.default({ aantalRechtbankScrapesWeg: 0 });
+        pre_run_js_1.default({ aantalRechtbankScrapesWeg: 5 });
     }
     catch (err) {
         statsWorker.berichtAanWorker({
@@ -42,9 +42,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     async function init() {
         const rechtbankScraper = workers_1.default.maakWorker('./build/primair/rechtbanken.js');
         rechtbankScraper.koppelStatsWorker(statsWorker);
+        rechtbankScraper.berichtAanWorker({
+            type: 'commando',
+            data: { commando: 'start' }
+        });
         const faillissementenLezer = workers_1.default.maakWorker('./build/secundair/faillezer.js');
         faillissementenLezer.koppelStatsWorker(statsWorker);
-        rechtbankScraper.berichtAanWorker({
+        faillissementenLezer.berichtAanWorker({
             type: 'commando',
             data: { commando: 'start' }
         });
