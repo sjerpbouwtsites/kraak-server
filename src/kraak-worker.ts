@@ -179,7 +179,7 @@ export namespace KraakBerichtData {
   }
   export interface Stats {
     log?: string;
-    tabel?: object;
+    tabel?: Record<string, unknown>;
     naam: string;
   }
   export interface StatusVerzoek {

@@ -27,7 +27,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     });
     // gebruikt tijdens dev... om fs te bewerken
     try {
-        pre_run_js_1.default({ aantalRechtbankScrapesWeg: 5 });
+        pre_run_js_1.default({ aantalRechtbankScrapesWeg: 0 });
     }
     catch (err) {
         statsWorker.berichtAanWorker({

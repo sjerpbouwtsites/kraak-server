@@ -16,7 +16,7 @@ statsWorker.berichtAanWorker({
 
 // gebruikt tijdens dev... om fs te bewerken
 try {
-  preRunScripts({ aantalRechtbankScrapesWeg: 5 });
+  preRunScripts({ aantalRechtbankScrapesWeg: 0 });
 } catch (err) {
   statsWorker.berichtAanWorker({
     type: 'subtaak-delegatie',

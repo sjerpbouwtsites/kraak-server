@@ -11,7 +11,7 @@ import nuts from '../nuts/generiek';
 import statHTML from './stats-html';
 import config from '../config';
 
-let statsWorkerMeta: workerMetaData = {
+const statsWorkerMeta: workerMetaData = {
   status: 'uit',
   fout: [],
   streaming: true
@@ -83,7 +83,7 @@ function statHTMLWrap(): Promise<boolean> {
   const s = statsWorkerMeta.streaming;
   const JS = s ? StatIndexReloadJS.bestand : StatIndexAfsluitenJS.bestand;
   const HTML = s ? statHtmlReload : statHtmlAfsluiten;
-  const CSS = true ? StatsIndexCSS.bestand : StatsIndexCSS.bestand;
+  const CSS = StatsIndexCSS.bestand;
   return statHTML(logData, tabelData, workersNamen, CSS, JS, HTML).then(
     (r: any) => r
   );
@@ -125,5 +125,5 @@ export interface LogStuk {
 }
 export interface TabelStuk {
   naam: string;
-  tabel: object;
+  tabel: Record<string, unknown>;
 }

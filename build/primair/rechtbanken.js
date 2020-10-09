@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /**
  * @file Worker. Leest map scrape-res uit voor de laatste succesvolle rechtank scrape en haalt alle missende één voor één op. 'gevulde' scrape resultaten worden als bestand opgeslagen & via referentie aan de controller doorgegeven.
  */
@@ -112,10 +113,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
      * data als YYYY-MM-DD
      */
     function lijstDagenTeScrapen() {
-        const rechtbankScraperRes = fs.readdirSync(`${config_1.default.pad.scrapeRes}/rechtbank`);
+        const rechtbankScraperRes = (() => {
+            try {
+                return fs.readdirSync(`${config_1.default.pad.scrapeRes}/rechtbank`);
+            }
+            catch (err) {
+                // TODO LOG NAAR STATS
+                console.log(err); // ts neppen
+                throw err;
+            }
+            // sorteren op datum/route
+        })().sort((naam1, naam2) => {
+            return naam1.replace(/\D/g, '') < naam2.replace(/\D/g, '') ? -1 : 1;
+        });
         const laatsteScrape = rechtbankScraperRes[rechtbankScraperRes.length - 1];
-        let datumRef = routeNaarDatum(laatsteScrape);
+        const datumRef = routeNaarDatum(laatsteScrape);
         const datumMax = new Date();
+        // TODO try wrap
         const { legeResponses } = JSON.parse(fs.readFileSync(`${config_1.default.pad.scrapeRes}/meta/rechtbankmeta.json`, 'utf-8'));
         /**
          * maakt Date[], dan YYYYMMJJ[], dan filter op eerdere lege responses.
@@ -168,11 +182,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
                 return antwoord.data;
             })
                 .then((jsonBlob) => {
-                if (!instanceOfRechtbankJSON(jsonBlob)) {
-                    const err = new Error('rechtbank JSON geen RechtbankJSON instance. antwoord in temp map');
-                    rechtbankMeta.fout.push(err);
-                    throw err;
-                }
                 if (jsonBlob.Instanties.length === 0) {
                     scrapeResultaatLeeg(route, scrapeDatumSucces);
                 }
@@ -211,21 +220,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         });
     }
     class Publicatieclusters extends Array {
-    }
-    /**
-     *
-     * @param jsonBlob
-     * @returns boolean
-     * Wie maakt er nu een 'typed' versie van JS als compileertaal terwijl
-     * JS in essentie een in de browser geinterpreteerde taal is?
-     * Mensen die nooit antwoorden krijgen van servers.
-     *
-     */
-    function instanceOfRechtbankJSON(jsonBlob) {
-        if (!jsonBlob.hasOwnProperty('Instanties')) {
-            return false;
-        }
-        return true;
     }
     function routeNaarDatum(routeNaam) {
         const d = routeNaam.replace('000000.json', '');

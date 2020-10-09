@@ -22,7 +22,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     const generiek_1 = __importDefault(require("../nuts/generiek"));
     const stats_html_1 = __importDefault(require("./stats-html"));
     const config_1 = __importDefault(require("../config"));
-    let statsWorkerMeta = {
+    const statsWorkerMeta = {
         status: 'uit',
         fout: [],
         streaming: true
@@ -81,7 +81,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
         const s = statsWorkerMeta.streaming;
         const JS = s ? StatIndexReloadJS.bestand : StatIndexAfsluitenJS.bestand;
         const HTML = s ? statHtmlReload : statHtmlAfsluiten;
-        const CSS = true ? StatsIndexCSS.bestand : StatsIndexCSS.bestand;
+        const CSS = StatsIndexCSS.bestand;
         return stats_html_1.default(logData, tabelData, workersNamen, CSS, JS, HTML).then((r) => r);
     }
     function startStatWorker() {

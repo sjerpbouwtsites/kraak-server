@@ -97,16 +97,21 @@ function lijstDagenTeScrapen(): string[] {
     try {
       return fs.readdirSync(`${config.pad.scrapeRes}/rechtbank`);
     } catch (err) {
-      // TODO LOG
+      // TODO LOG NAAR STATS
       console.log(err); // ts neppen
       throw err;
     }
-  })();
+    // sorteren op datum/route
+  })().sort((naam1: string, naam2: string) => {
+    return naam1.replace(/\D/g, '') < naam2.replace(/\D/g, '') ? -1 : 1;
+  });
 
   const laatsteScrape = rechtbankScraperRes[rechtbankScraperRes.length - 1];
   const datumRef = routeNaarDatum(laatsteScrape);
+
   const datumMax = new Date();
 
+  // TODO try wrap
   const { legeResponses } = JSON.parse(
     fs.readFileSync(`${config.pad.scrapeRes}/meta/rechtbankmeta.json`, 'utf-8')
   );
