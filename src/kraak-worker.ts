@@ -11,31 +11,42 @@ import { parentPort } from 'worker_threads';
  *
  */
 export class KraakWorker extends Worker {
-  public workerLocatie: string | null = null;
-  public workerNaam: string | null = null;
-  /**
-   * ! primaire scrapers weten zelf hun werk dus bepalen zelf of ze wachtend zijn
-   * ! secundaire scrapers horen van hun meester-scraper of ze mogelijk nog werk krijgen.
 
-   * betreft allemaal het Worker proces.
-   * 
-   * uit          - ~ is onopgestart
-   * gestart      - ~ is opgestart, doet *nog* geen werk.
-   * lekker-bezig  - ~ is opgestart, en is met werk bezig.
-   * afwachtend   - ~ is opgestart, heeft nu geen werk, of meer komt onduidelijk
-   * afgekapt     - ~ is opgelegd gestopt, maar heeft nog werk hebben.
-   * mss-afgekapt - ~ is opgelegd gestopt,
-   *                   maar had mogelijk meer werk gekregen.
-   * verloren     - ~ gestopt door een uncaughtException
-   * foute-limbo  - ~ is ogestart, ving fout af, zit nu vast
-   * klaar        - ~ is opgestart, heeft nooit meer werk.
-   * opgeruimd    - ~ is gestopt, heeft nooit meer werk.
-   */
-  public workerThreadStatus: WorkerThreadStatus = 'uit';
+  protected workerNaam: string | null = null;
+
   /**
    * bepaalt door in welk mapje de worker zit.
    */
-  public workerArbeidsRelatie: WorkerArbeidsrelatie;
+  protected workerArbeidsRelatie: WorkerArbeidsrelatie;
+
+  /**
+   * De vaak verandere overzichtsgegevens van de workerTHREAD.
+   * opgeslagen in kraak-worker zodat controller erbij kan.
+   *
+   * @type {WorkerThreadMeta}
+   * @memberof KraakWorker
+   */
+  private _workerMeta: WorkerThreadMeta = {
+    werkTeDoen: [],
+    threadStatus: 'uit'
+  }
+  get workerMeta(): WorkerThreadMeta {
+    return this._workerMeta;
+  }
+  /**
+   * schrijft naar _workerMeta en update de statsworker.
+   */
+  set workerMeta(workerThreadMeta: WorkerThreadMeta) {
+    this.statsWorker?.berichtAanWorker({
+      type: 'subtaak-delegatie',
+      data: {
+        naam: this.workerNaam,
+        tabel: workerThreadMeta
+      }
+    });
+    this._workerMeta = Object.assign(this._workerMeta, workerThreadMeta)
+  }
+  
 
   /**
    * referentie naar statsWorker Worker class instance
@@ -68,6 +79,8 @@ export class KraakWorker extends Worker {
       this.statsWorker = statsWorker;
     }
   }
+
+  
 
   /**
    * oude log methode... gehouden omdat de logger in
@@ -103,6 +116,11 @@ export class KraakWorker extends Worker {
           }
         });
       }
+       else if (bericht.type === 'meta') {
+
+        this.workerMeta = bericht.data as KraakBerichtData.Meta;
+
+      }      
     });
     return this;
   }
@@ -123,6 +141,29 @@ export class KraakWorker extends Worker {
   }
 }
 
+export type WorkerThreadMeta = {
+  foutMelding?: Error,
+  werkTeDoen?: unknown[],
+  threadStatus?: WorkerThreadStatus,
+}
+  /**
+   * ! primaire scrapers weten zelf hun werk dus bepalen zelf of ze wachtend zijn
+   * ! secundaire scrapers horen van hun meester-scraper of ze mogelijk nog werk krijgen.
+
+   * betreft allemaal het Worker proces.
+   * 
+   * uit          - ~ is onopgestart
+   * gestart      - ~ is opgestart, doet *nog* geen werk.
+   * lekker-bezig  - ~ is opgestart, en is met werk bezig.
+   * afwachtend   - ~ is opgestart, heeft nu geen werk, of meer komt onduidelijk
+   * afgekapt     - ~ is opgelegd gestopt, maar heeft nog werk hebben.
+   * mss-afgekapt - ~ is opgelegd gestopt,
+   *                   maar had mogelijk meer werk gekregen.
+   * verloren     - ~ gestopt door een uncaughtException
+   * foute-limbo  - ~ is ogestart, ving fout af, zit nu vast
+   * klaar        - ~ is opgestart, heeft nooit meer werk.
+   * opgeruimd    - ~ is gestopt, heeft nooit meer werk.
+   */
 export type WorkerThreadStatus =
   | 'uit'
   | 'gestart'
@@ -142,8 +183,10 @@ export type WorkerArbeidsrelatie = 'primair' | 'secundair';
 export type KraakBerichtType =
   | 'subtaak-delegatie'
   | 'stats'
-  | 'status-verzoek'
-  | 'status-antwoord'
+  | 'status-verzoek' // vanuit controller -> kraak-worker
+  | 'status' // vanuit kraak-worker -> controller
+  | 'status-nieuws' // vanuit thread -> kraak-worker
+  | 'meta' // vanuit thread -> kraak-worker
   | 'commando'
   | 'console';
 
@@ -169,7 +212,8 @@ export interface KraakBericht {
     | KraakBerichtData.SubtaakDelegatie
     | KraakBerichtData.Stats
     | KraakBerichtData.StatusVerzoek
-    | KraakBerichtData.StatusAntwoord
+    | KraakBerichtData.StatusNieuws    
+    | KraakBerichtData.Meta     
     | KraakBerichtData.Commando;
 }
 
@@ -183,12 +227,19 @@ export namespace KraakBerichtData {
     naam: string;
   }
   export interface StatusVerzoek {
-    [index: string]: never;
+    [index: string]: never; // dus leeg
   }
-  export interface StatusAntwoord {
+  export interface StatusNieuws {
     status: WorkerThreadStatus;
-    fout?: Error; // indien status
   }
+  export interface Meta {
+    foutMelding?: Error,
+    werkTeDoen?: unknown[],
+    threadStatus?: WorkerThreadStatus,    
+  }
+
+  
+  
   export interface Commando {
     commando: WorkerThreadCommandos;
   }

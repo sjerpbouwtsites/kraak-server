@@ -9,75 +9,59 @@ import config from '../config';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import nuts from '../nuts/generiek';
 import { KraakBericht } from '../kraak-worker';
-import workersNuts, { workerMetaData } from '../nuts/workers';
+import workersNuts from '../nuts/workers';
+import WerkService from "../nuts/WerkService";
 
-/**
- * houder van metadata, wordt heen en terug gegeven door workersNuts.zetMetaData
- */
-let rechtbankMeta: workerMetaData = {
-  status: 'uit',
-  fout: [],
-  werkTeDoen: [] // volgt hier dagenTeScrapen
-};
+const RechtbankenWerkService = new WerkService<string>();
 
+// 'delegeert' controller-commando's naar rechtbanken worker init, stop en ruim op functies.
 parentPort?.on('message', (bericht: KraakBericht) => {
   workersNuts.commandoTypeBerichtBehandelaar(
     bericht,
     initScraper,
-    stopScaper,
+    stopScraper,
     ruimScraperOp
   );
 });
+
 
 /**
  * organisatie. initialisatiefunctie aangeroepen door message eventhandler.
  */
 function initScraper() {
-  parentPort?.postMessage({
-    type: 'console',
-    data: 'rechtbanken init functie'
-  });
+
   workersNuts.log('gestart');
-  const dagenTeScrapen = lijstDagenTeScrapen();
-  workersNuts.tabel(dagenTeScrapen);
-  rechtbankMeta.werkTeDoen = dagenTeScrapen;
-  scrapeData(dagenTeScrapen).then((scrapeExitBoodschap) => {
+  RechtbankenWerkService.teDoen = lijstDagenTeScrapen();
+
+  scrapeData().then((scrapeExitBoodschap) => {
     if (scrapeExitBoodschap === true) {
-      rechtbankMeta = workersNuts.zetMetaData(rechtbankMeta, {
-        status: 'gestopt'
-      });
-      process.exit();
+      stopScraper();
     } else {
-      rechtbankMeta = workersNuts.zetMetaData(rechtbankMeta, {
-        status: 'fout',
-        fout: new Error('onbekende fout in rechtbank na scrapen')
-      });
+      workersNuts.meta({foutMelding: new Error('onbekende fout in rechtbank na scrapen')});
     }
   });
 }
 /**
- * organisatie. Als meta werkTeDoen niet leeg, log, creer fout, anders correc afgesloten process exit.
+ * organisatie. Als meta werkTeDoen niet leeg, creer fout, meta meld anders correc afgesloten process exit.
  */
-function stopScaper() {
-  let werkFout: Error | null = null;
-  if (rechtbankMeta.werkTeDoen.length) {
-    workersNuts.log(
-      `ik heb nog werk te doen maar wordt gestopt! Nog ${rechtbankMeta.werkTeDoen.length} te gaan...`
-    );
-    werkFout = new Error(
-      'rechtbank gestopt maar werkTeDoen is nog' +
-        rechtbankMeta.werkTeDoen.length
-    );
+function stopScraper() : void{
+
+  const tdl = RechtbankenWerkService.telTeDoen();
+  if (tdl > 0) {
+    const err = new Error(`Rechtbank prematuur stopgezet met ${tdl} taken over`)
+      workersNuts.meta({
+        threadStatus: 'afgekapt',
+        foutMelding: err
+      });
+      throw err;
+      return;
   }
-  rechtbankMeta = workersNuts.zetMetaData(rechtbankMeta, {
-    status: 'gestopt',
-    fout: werkFout ? [werkFout] : []
+
+  workersNuts.meta({
+    threadStatus: 'opgeruimd',
   });
-  if (werkFout) {
-    throw werkFout;
-  } else {
-    process.exit();
-  }
+  process.exit();
+ 
 }
 /**
  *
@@ -93,16 +77,7 @@ function ruimScraperOp() {
  * data als YYYY-MM-DD
  */
 function lijstDagenTeScrapen(): string[] {
-  const rechtbankScraperRes = (() => {
-    try {
-      return fs.readdirSync(`${config.pad.scrapeRes}/rechtbank`);
-    } catch (err) {
-      // TODO LOG NAAR STATS
-      console.log(err); // ts neppen
-      throw err;
-    }
-    // sorteren op datum/route
-  })().sort((naam1: string, naam2: string) => {
+  const rechtbankScraperRes = fs.readdirSync(`${config.pad.scrapeRes}/rechtbank`).sort((naam1: string, naam2: string) => {
     return naam1.replace(/\D/g, '') < naam2.replace(/\D/g, '') ? -1 : 1;
   });
 
@@ -130,11 +105,9 @@ function lijstDagenTeScrapen(): string[] {
 
 /**
  * ontvangt array met data en scraped die tot klaar, stuk voor stuk
- * @param dagenTeScrapen
  */
-async function scrapeData(dagenTeScrapen: string[]) {
-  let scrapeDag = dagenTeScrapen.shift();
-  rechtbankMeta.werkTeDoen = dagenTeScrapen;
+async function scrapeData() : Promise<boolean> {
+  let scrapeDag = RechtbankenWerkService.eersteUitLijst();
   if (!scrapeDag) {
     return true;
   }
@@ -145,12 +118,14 @@ async function scrapeData(dagenTeScrapen: string[]) {
         `scrapede route ${scrapeAns.route} - was ${scrapeAns.type}`
       );
       if (scrapeAns.type === 'gevuld') {
+        // omhoog naar controller!
         workersNuts.subtaakDelegatie(scrapeAns.json);
       }
-      scrapeDag = dagenTeScrapen.shift();
+      scrapeDag = RechtbankenWerkService.eersteUitLijst();
     } while (scrapeDag);
   } catch (error) {
-    throw new Error(error);
+    workersNuts.meta({foutMelding: error, threadStatus:'vastgelopen'})
+    throw error;
   }
   return true;
 }
@@ -159,7 +134,7 @@ async function scrapeData(dagenTeScrapen: string[]) {
  * Scraped losse datum & schrijft die weg
  * @param datum
  */
-function scrapeDatum(this: any, datum: string): Promise<scrapeDatumAns> {
+function scrapeDatum(datum: string): Promise<scrapeDatumAns> {
   return new Promise((scrapeDatumSucces, scrapeDatumFaal) => {
     const route = datum.replace(/-/g, '').padEnd(14, '0');
     const url = `https://insolventies.rechtspraak.nl/Services/BekendmakingenService/haalOp/${route}`;
@@ -189,6 +164,7 @@ function scrapeResultaatLeeg(
   route: string,
   succesFunc: (arg: TypeRouteObj) => Record<string, unknown>
 ) {
+  // een json bestand, niet een lokale store.
   const rechtbankMeta = JSON.parse(
     fs.readFileSync(`${config.pad.scrapeRes}/meta/rechtbankmeta.json`, 'utf-8')
   );

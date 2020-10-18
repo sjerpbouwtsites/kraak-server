@@ -1,6 +1,5 @@
-import { KraakBericht } from './kraak-worker';
+import { KraakWorker } from './kraak-worker';
 import procesNuts from './nuts/proces';
-import nuts from './nuts/generiek';
 import workersNuts from './nuts/workers';
 import startStatsServer from './stats/indexServer';
 import preRunScripts from './pre-run.js';
@@ -15,48 +14,35 @@ statsWorker.berichtAanWorker({
 });
 
 // gebruikt tijdens dev... om fs te bewerken
-try {
-  preRunScripts({ aantalRechtbankScrapesWeg: 0 });
-} catch (err) {
-  statsWorker.berichtAanWorker({
-    type: 'subtaak-delegatie',
-    data: {
-      naam: 'pre-run',
-      tabel: err
-    }
-  });
-}
+preRunScripts(statsWorker, { aantalRechtbankScrapesWeg: 0 });
 
 procesNuts.nodeVersieControle();
 
 async function init() {
+  // maak workers
   const rechtbankScraper = workersNuts.maakWorker(
     './build/primair/rechtbanken.js'
   );
-  rechtbankScraper.koppelStatsWorker(statsWorker);
-  rechtbankScraper.berichtAanWorker({
-    type: 'commando',
-    data: { commando: 'start' }
-  });
   const faillissementenLezer = workersNuts.maakWorker(
     './build/secundair/faillezer.js'
   );
+  // koppel aan statsworker
+  rechtbankScraper.koppelStatsWorker(statsWorker);
   faillissementenLezer.koppelStatsWorker(statsWorker);
-  faillissementenLezer.berichtAanWorker({
-    type: 'commando',
-    data: { commando: 'start' }
+
+  // start rechtbankscraper en faillissementslezer.
+  [rechtbankScraper, faillissementenLezer].forEach((worker: KraakWorker) => {
+    worker.berichtAanWorker({
+      type: 'commando',
+      data: { commando: 'start' }
+    });
   });
 
-  rechtbankScraper.on('message', (bericht: KraakBericht) => {
-    if (bericht.type === 'subtaak-delegatie') {
-      faillissementenLezer.berichtAanWorker(bericht as KraakBericht);
-    }
-  });
 
-  nuts.time(30000).then(() => {
-    // TODO als de scrapers stil zijn e.d. ??
-    procesNuts.stop(statsWorker);
-  });
+  // nuts.time(30000).then(() => {
+  //   // TODO als de scrapers stil zijn e.d. ??
+  //   procesNuts.stop(statsWorker);
+  // });
 
   // draai varia scrapers
   // try {
