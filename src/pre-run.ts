@@ -6,6 +6,7 @@
 
 import * as fs from 'fs';
 import config from './config';
+import {KraakWorker} from "./kraak-worker";
 
 /**
  * kan overschreven worden vanuit index.ts
@@ -38,16 +39,20 @@ const verwijderLaatsteRechtbankScrapes = function (
 
 /**
  * Runner te gebruiken in index.ts.
- * geef evt. fouten terug.
  */
-export default function (configVanController?: PreRunConfig): Error[] | null {
-  let preE: Error[] = [];
-  let e = verwijderLaatsteRechtbankScrapes(configVanController);
-  if (!!e && e.length > 0) {
-    preE = preE.concat(e);
-    e = [];
+export default function (statsWorker : KraakWorker, configVanController?: PreRunConfig): void {
+  try {
+    verwijderLaatsteRechtbankScrapes(configVanController);
+  } catch (err) {
+    statsWorker.berichtAanWorker({
+      type: 'subtaak-delegatie',
+      data: {
+        naam: 'pre-run',
+        tabel: err
+      }
+    });
   }
-  return preE.length > 0 ? preE : null;
+
 }
 
 interface PreRunConfig {
